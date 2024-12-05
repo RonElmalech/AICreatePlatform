@@ -6,8 +6,6 @@ import fs from 'fs';
 
 dotenv.config();
 
-
-
 const router = express.Router();
 
 // Ensure GCLOUD_KEY_FILE environment variable is defined
@@ -27,7 +25,7 @@ try {
     throw error; // Stop the server if credentials cannot be loaded
 }
 
-const { Storage } = require('@google-cloud/storage'); // Ensure this is imported
+// Initialize Google Cloud Storage client
 const storage = new Storage({
     credentials: googleCredentials, // Use the parsed credentials
     projectId: process.env.GCLOUD_PROJECT_ID, // Your project ID
@@ -44,7 +42,6 @@ router.get('/', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
-
 
 // Create a post
 router.post('/', async (req, res) => {
