@@ -13,6 +13,8 @@ COPY ./ ./
 # Make sure this generates the 'dist' folder
 RUN npm run build  
 
+RUN ls /usr/share/nginx/html
+
 # Step 2: Serve the Vite app with NGINX
 FROM nginx:latest
 
