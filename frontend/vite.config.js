@@ -9,9 +9,6 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    proxy: {
-      '/api': `https://texttoimageproject-backend.onrender.com`,  // Replace with your backend server URL
-    },
   },
   build: {
     outDir: 'dist',  // Output build files to 'dist' folder
