@@ -22,7 +22,7 @@ const CreatePost = () => {
     if (form.prompt && form.photo) {
       setLoading(true);  
       try {
-        const response = await axios.post(`/api/v1/post`,
+        const response = await axios.post(`https://texttoimageproject-backend.onrender.com/api/v1/post`,
         form,
         { headers: { 'Content-Type': 'application/json' } }
         );
@@ -61,7 +61,7 @@ const CreatePost = () => {
     if (form.prompt) {
       try {
         setGeneratingImg(true);
-        const response = await axios.post(`/api/v1/dalle/generate-image`,
+        const response = await axios.post(`https://texttoimageproject-backend.onrender.com/api/v1/dalle/generate-image`,
         { prompt: form.prompt },
         { headers: { 'Content-Type': 'application/json' } }
         );
