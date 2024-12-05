@@ -4,16 +4,14 @@ FROM node:20.18.1-alpine AS build
 WORKDIR /app
 
 # Copy package.json and install dependencies
-COPY ./package.json ./
+COPY ./package.json ./package-lock.json ./
 RUN npm install
 
 # Copy all other source files and build the app
 COPY ./ ./
 
-# Make sure this generates the 'dist' folder
+# Ensure the build command is run correctly
 RUN npm run build  
-
-
 
 # Step 2: Serve the Vite app with NGINX
 FROM nginx:latest
@@ -22,7 +20,7 @@ FROM nginx:latest
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Check if the 'dist' directory is copied
-RUN ls /usr/share/nginx/html
+RUN ls /usr/share/nginx/html  # Debugging step
 
 # Expose port 80 for Nginx to serve the app
 EXPOSE 80
