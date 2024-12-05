@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -11,7 +10,7 @@ export default defineConfig({
       usePolling: true,
     },
     proxy: {
-      '/api': `https://texttoimageproject-backend.onrender.com`,  // Replace with your backend server URL and port
+      '/api': `https://texttoimageproject-backend.onrender.com`,  // Replace with your backend server URL
     },
   },
   build: {
