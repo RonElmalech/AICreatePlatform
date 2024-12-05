@@ -6,8 +6,13 @@ import postRoutes from './mongodb/routes/postRoutes.js';
 import dalleRoutes from './mongodb/routes/dalleRoutes.js';
 import path from 'path';
 import express from 'express';
+
+
 // Load environment variables
 dotenv.config();
+
+// Create an Express application
+const app = express();
 
 // Define the allowed frontend origin
 const allowedOrigins = ['https://texttoimageproject-frontend.onrender.com'];
