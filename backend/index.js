@@ -9,14 +9,24 @@ import express from 'express';
 // Load environment variables
 dotenv.config();
 
-const app = express();
+// Define the allowed frontend origin
+const allowedOrigins = ['https://texttoimageproject-frontend.onrender.com'];
 
-// Middleware for CORS
+// CORS options to only allow GET and POST methods from the allowed origin
 const corsOptions = {
-    origin: '*', // Allow all origins (or specify your NGINX domain)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  };
+  origin: (origin, callback) => {
+    // Allow the origin if it matches the frontend domain, or if there is no origin (e.g., for local development)
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST'],  // Allow only GET and POST methods
+  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers for the request
+};
+
+// Use the CORS middleware with the defined options
 app.use(cors(corsOptions));
 
 // Middleware to parse JSON
