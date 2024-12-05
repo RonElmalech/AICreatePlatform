@@ -17,9 +17,6 @@ FROM nginx:latest
 # Copy the 'dist' directory (the output folder of Vite) to Nginx's html directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy the custom Nginx config file to override the default one
-COPY ../nginx/nginx.conf /etc/nginx/nginx.conf
-
 # Expose port 80 for Nginx to serve the app
 EXPOSE 80
 
