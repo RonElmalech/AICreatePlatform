@@ -11,7 +11,7 @@ export default defineConfig({
       usePolling: true,
     },
     proxy: {
-      '/api': `${import.meta.VITE_BACKEND_URL}`,  // Replace with your backend server URL and port
+      '/api': `https://texttoimageproject-backend.onrender.com`,  // Replace with your backend server URL and port
     },
   },
   build: {
