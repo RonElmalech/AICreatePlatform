@@ -1,9 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import dotenv from 'dotenv';
 
-// Load environment variables from .env at the root level
-dotenv.config({ path: '../.env' });
 
 export default defineConfig({
   plugins: [react()],
@@ -19,8 +16,5 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',  // Output build files to 'dist' folder
-  },
-  define: {
-    'process.env': process.env,  // Ensure that env vars are correctly passed
   },
 })
