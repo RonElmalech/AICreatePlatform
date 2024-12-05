@@ -9,6 +9,8 @@ RUN npm install
 
 # Copy all other source files and build the app
 COPY ./ ./
+
+# Make sure this generates the 'dist' folder
 RUN npm run build  
 
 # Step 2: Serve the Vite app with NGINX
