@@ -10,26 +10,26 @@ dotenv.config();
 
 const router = express.Router();
 
-// Ensure the environment variable for the credentials file path is defined
-const credentialsPath = process.env.GCLOUD_KEY_FILE_PATH;
+// Ensure GCLOUD_KEY_FILE environment variable is defined
+const googleKeyFile = process.env.GCLOUD_KEY_FILE;
 
-if (!credentialsPath) {
-    throw new Error('GCLOUD_KEY_FILE_PATH is not defined in environment variables.');
+if (!googleKeyFile) {
+    throw new Error('GCLOUD_KEY_FILE is not defined in environment variables.');
 }
 
 let googleCredentials;
 
-// Try reading and parsing the credentials file
+// Try parsing the GCLOUD_KEY_FILE environment variable as JSON
 try {
-    const fileContent = fs.readFileSync(credentialsPath, 'utf-8');
-    googleCredentials = JSON.parse(fileContent);
+    googleCredentials = JSON.parse(googleKeyFile);
 } catch (error) {
-    console.error('Error reading or parsing GCLOUD_KEY_FILE_PATH:', error.message);
+    console.error('Error parsing GCLOUD_KEY_FILE:', error.message);
     throw error; // Stop the server if credentials cannot be loaded
 }
 
+const { Storage } = require('@google-cloud/storage'); // Ensure this is imported
 const storage = new Storage({
-    credentials: googleCredentials, // Use the loaded credentials
+    credentials: googleCredentials, // Use the parsed credentials
     projectId: process.env.GCLOUD_PROJECT_ID, // Your project ID
 });
 
@@ -44,6 +44,7 @@ router.get('/', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
 
 // Create a post
 router.post('/', async (req, res) => {
