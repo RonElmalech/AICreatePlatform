@@ -20,6 +20,8 @@ jobs:
         volumes:
           - ./frontend/dist:/usr/share/nginx/html
           - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        environment:
+          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
       # Backend
       backend:
@@ -84,6 +86,12 @@ jobs:
       run: |
         docker-compose -f docker-compose.yml build
         docker-compose -f docker-compose.yml push
+
+    - name: Prepare Nginx Config with BACKEND_URL
+      run: |
+        # Replace BACKEND_URL in the nginx.conf using envsubst
+        envsubst < ./nginx/nginx.conf > ./nginx/nginx.conf.tmp
+        mv ./nginx/nginx.conf.tmp ./nginx/nginx.conf
 
     - name: Deploy Docker containers
       run: |

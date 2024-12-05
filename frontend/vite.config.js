@@ -14,7 +14,7 @@ export default defineConfig({
       usePolling: true,
     },
     proxy: {
-      '/api': 'http://backend:5000/',  // Replace with your backend server URL and port
+      '/api': `${import.meta.VITE_BACKEND_URL}`,  // Replace with your backend server URL and port
     },
   },
   build: {
