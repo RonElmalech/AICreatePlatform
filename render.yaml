@@ -1,16 +1,11 @@
 services:
-  # Frontend Service
-  - type: web
+  # Frontend as a static site
+  - type: static_site
     name: frontend
-    env: docker
-    buildCommand: npm install && npm run build  # Build the frontend
-    startCommand: nginx -g "daemon off;"       # Start Nginx to serve the frontend
-    dockerfilePath: ./frontend/Dockerfile
-    staticPublishPath: /usr/share/nginx/html  # Path to serve static files
-    envVars:
-      - key: NGINX_HOST
-        value: https://texttoimageproject-frontend.onrender.com  # Use the Render URL for the frontend
-    autoDeploy: true
+    buildCommand: npm install && npm run build  # Build the React app (Vite)
+    publishDirectory: ./dist  # Directory containing static files (after build)
+    autoDeploy: true  # Automatically deploy on push to GitHub
+
 
   # Backend Service
   - type: web
