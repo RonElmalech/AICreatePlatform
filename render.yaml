@@ -1,0 +1,35 @@
+services:
+  # Frontend Service
+  - type: web
+    name: frontend
+    env: docker
+    buildCommand: npm install && npm run build
+    startCommand: nginx -g "daemon off;"
+    staticPublishPath: /usr/share/nginx/html
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: NGINX_HOST
+        value: https://texttoimageproject-frontend.onrender.com
+    autoDeploy: true
+
+  # Backend Service
+  - type: web
+    name: backend
+    env: docker
+    buildCommand: npm install
+    startCommand: node index.js
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: PORT
+        value: 5000
+    autoDeploy: true
+
+  # Nginx Service
+  - type: web
+    name: nginx
+    env: docker
+    dockerfilePath: ./nginx/Dockerfile
+    envVars:
+      - key: BACKEND_URL
+        value: https://texttoimageproject-backend.onrender.com  # Ensure this is correct for proxying
+    autoDeploy: true
