@@ -1,35 +1,37 @@
 services:
-  # Frontend Service (React/Vite)
+  # Frontend Service
   - type: web
     name: frontend
     env: docker
-    buildCommand: npm install && npm run build  # Build the frontend first
-    startCommand: nginx -g "daemon off;"  # Nginx will serve the built frontend
-    dockerfilePath: ./frontend/Dockerfile  # Path to the Dockerfile for the frontend
-    staticPublishPath: /usr/share/nginx/html  # The directory Nginx will serve
+    buildCommand: npm install && npm run build  # Build the frontend
+    startCommand: nginx -g "daemon off;"       # Start Nginx to serve the frontend
+    dockerfilePath: ./frontend/Dockerfile
+    staticPublishPath: /usr/share/nginx/html  # Path to serve static files
     envVars:
       - key: NGINX_HOST
-        value: https://texttoimageproject-frontend.onrender.com
+        value: https://texttoimageproject-frontend.onrender.com  # Use the Render URL for the frontend
     autoDeploy: true
 
-  # Backend Service (Node.js API)
-  - type: websh
+  # Backend Service
+  - type: web
     name: backend
     env: docker
-    buildCommand: npm install
-    startCommand: node index.js
+    buildCommand: npm install                 # Install backend dependencies
+    startCommand: node index.js               # Start the backend
     dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: PORT
-        value: 5000
+        value: 5000                           # Ensure the backend runs on port 5000
     autoDeploy: true
 
-  # Nginx Service (To serve the frontend and proxy to backend)
+  # Nginx Service
   - type: web
     name: nginx
     env: docker
-    dockerfilePath: ./nginx/Dockerfile  # Path to the Nginx Dockerfile
-    envVars:
-      - key: BACKEND_URL
-        value: https://texttoimageproject-backend.onrender.com  # Ensure this is correct for proxying to your backend
+    buildCommand: npm install && npm run build  # Build frontend before starting Nginx
+    startCommand: nginx -g "daemon off;"        # Start Nginx
+    dockerfilePath: ./nginx/Dockerfile
     autoDeploy: true
+    dependsOn:
+      - frontend
+      - backend   # Ensure Nginx starts only after frontend and backend are ready
