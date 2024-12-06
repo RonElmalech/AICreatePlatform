@@ -6,7 +6,6 @@ services:
     publishDirectory: ./dist  # Directory containing static files (after build)
     autoDeploy: true  # Automatically deploy on push to GitHub
 
-
   # Backend Service
   - type: web
     name: backend
@@ -19,11 +18,11 @@ services:
         value: 5000                           # Ensure the backend runs on port 5000
     autoDeploy: true
 
-  # Nginx Service
+  # Nginx Service (Serve frontend and proxy API requests)
   - type: web
     name: nginx
     env: docker
-    buildCommand: npm install && npm run build  # Build frontend before starting Nginx
+    buildCommand: npm install && npm run build  # Build frontend before starting Nginx (Note: this might not be necessary for Nginx)
     startCommand: nginx -g "daemon off;"        # Start Nginx
     dockerfilePath: ./nginx/Dockerfile
     autoDeploy: true
