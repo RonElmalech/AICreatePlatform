@@ -19,7 +19,7 @@ const CreatePost = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    if (form.prompt && form.photo) {
+    if (form.prompt && form.photo && form.name) {
       setLoading(true);  
       try {
         const response = await axios.post(`/api/v1/post`,
@@ -40,7 +40,7 @@ const CreatePost = () => {
         setLoading(false);
       }
     } else {
-      alert('Please enter a prompt and generate an image');
+      alert('Please enter a name, prompt, and generate an image');
     }
   };
   
@@ -60,11 +60,13 @@ const CreatePost = () => {
   const generateImage = async () => {
     if (form.prompt) {
       try {
-        setGeneratingImg(true);
+        setGeneratingImg(true); 
         const response = await axios.post(`/api/v1/dalle/generate-image`,
         { prompt: form.prompt },
         { headers: { 'Content-Type': 'application/json' } }
         );
+       
+        
 
         if (response.status === 200 && response.data.imageBase64) {
           setForm({ ...form, photo: response.data.imageBase64 });  // Set base64 string to form

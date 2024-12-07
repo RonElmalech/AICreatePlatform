@@ -14,11 +14,9 @@ const CF_API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/
 router.route('/generate-image').post(async (req, res) => {
     try {
         const { prompt } = req.body;
-
         if (!prompt) {
             return res.status(400).json({ error: 'Prompt is required' });
         }
-
         const input = { prompt };
 
         // Call Cloudflare API to generate an image using axios

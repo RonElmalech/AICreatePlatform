@@ -14,8 +14,9 @@ dotenv.config();
 // Create an Express application
 const app = express();
 
+
 // Define the allowed frontend origin
-const allowedOrigins = ['http://locahost:3000'];
+const allowedOrigins = ['http://localhost:3000',"http://localhost"];
 
 // CORS options to only allow GET and POST methods from the allowed origin
 const corsOptions = {
@@ -30,6 +31,7 @@ const corsOptions = {
   methods: ['GET', 'POST'],  // Allow only GET and POST methods
   allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers for the request
 };
+
 
 // Use the CORS middleware with the defined options
 app.use(cors(corsOptions));
