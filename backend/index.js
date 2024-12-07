@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 
 // Define the allowed frontend origin
-const allowedOrigins = ['https://texttoimageproject-frontend.onrender.com'];
+const allowedOrigins = ['http://locahost:3000'];
 
 // CORS options to only allow GET and POST methods from the allowed origin
 const corsOptions = {

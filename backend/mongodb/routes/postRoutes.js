@@ -9,25 +9,20 @@ dotenv.config();
 const router = express.Router();
 
 // Ensure GCLOUD_KEY_FILE environment variable is defined
-const googleKeyFile = process.env.GCLOUD_KEY_FILE;
+const googleKeyFilePath = process.env.GCLOUD_KEY_FILE_PATH;
 
-if (!googleKeyFile) {
+if (!googleKeyFilePath) {
     throw new Error('GCLOUD_KEY_FILE is not defined in environment variables.');
 }
 
-let googleCredentials;
-
-// Try parsing the GCLOUD_KEY_FILE environment variable as JSON
-try {
-    googleCredentials = JSON.parse(googleKeyFile);
-} catch (error) {
-    console.error('Error parsing GCLOUD_KEY_FILE:', error.message);
-    throw error; // Stop the server if credentials cannot be loaded
+// Verify that the file exists
+if (!fs.existsSync(googleKeyFilePath)) {
+    throw new Error(`GCLOUD_KEY_FILE path does not exist: ${googleKeyFilePath}`);
 }
 
-// Initialize Google Cloud Storage client
+// Initialize Google Cloud Storage client using the key file
 const storage = new Storage({
-    credentials: googleCredentials, // Use the parsed credentials
+    keyFilename: googleKeyFilePath, // Use the file path
     projectId: process.env.GCLOUD_PROJECT_ID, // Your project ID
 });
 
