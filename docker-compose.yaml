@@ -4,6 +4,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    volumes:
+      - vite-build:/usr/share/nginx/html
     networks:
       - app-network
     container_name: frontend
@@ -35,10 +37,14 @@ services:
       - "80:80"
     depends_on:
       - frontend
-      - backend
+    volumes:
+      - vite-build:/usr/share/nginx/html
     networks:
       - app-network
     container_name: nginx
+
+volumes:
+  vite-build:
 
 networks:
   app-network:
