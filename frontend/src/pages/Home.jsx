@@ -45,7 +45,7 @@ const Home = () => {
       const fetchPosts = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`https://texttoimageproject-backend.onrender.com/api/v1/post`, {
+          const response = await axios.get(`/api/v1/post`, {
             headers: { 'Content-Type': 'application/json' },
           });
           setAllPosts(response.data.data.reverse());
