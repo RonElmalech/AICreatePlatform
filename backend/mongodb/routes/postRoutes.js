@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'; 
 import * as dotenv from 'dotenv';
 import { Storage } from '@google-cloud/storage';
 import Post from '../models/post.js';
@@ -8,21 +8,30 @@ dotenv.config();
 
 const router = express.Router();
 
-// Ensure GCLOUD_KEY_FILE environment variable is defined
-const googleKeyFilePath = process.env.GCLOUD_KEY_FILE_PATH;
+// Ensure GCLOUD_CREDENTIALS_BASE64 environment variable is defined
+const base64Credentials = process.env.GCLOUD_CREDENTIALS_BASE64;
 
-if (!googleKeyFilePath) {
-    throw new Error('GCLOUD_KEY_FILE is not defined in environment variables.');
+
+if (!base64Credentials) {
+    throw new Error('GCLOUD_CREDENTIALS_BASE64 is not defined in environment variables.');
 }
 
-// Verify that the file exists
-if (!fs.existsSync(googleKeyFilePath)) {
-    throw new Error(`GCLOUD_KEY_FILE path does not exist: ${googleKeyFilePath}`);
+// Function to add padding to the Base64 string
+function addBase64Padding(base64String) {
+    const padding = base64String.length % 4 === 0 ? 0 : 4 - (base64String.length % 4);
+    return base64String + '='.repeat(padding);
 }
 
-// Initialize Google Cloud Storage client using the key file
+// Re-add padding to the credentials
+const base64CredentialsWithPadding = addBase64Padding(base64Credentials);
+
+// Decode the base64 credentials and parse it as JSON
+const credentialsJson = Buffer.from(base64CredentialsWithPadding, 'base64').toString('utf8');
+const credentials = JSON.parse(credentialsJson);
+
+// Initialize Google Cloud Storage client using the decoded credentials
 const storage = new Storage({
-    keyFilename: googleKeyFilePath, // Use the file path
+    credentials, // Use the decoded JSON credentials
     projectId: process.env.GCLOUD_PROJECT_ID, // Your project ID
 });
 

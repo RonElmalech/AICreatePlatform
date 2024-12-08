@@ -27,7 +27,6 @@ router.route('/generate-image').post(async (req, res) => {
             },
             responseType: 'arraybuffer',
         });
-        console.log((response.data));
         
 
         if (response.status !== 200) {
