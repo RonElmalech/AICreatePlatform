@@ -6,17 +6,34 @@ import postRoutes from './mongodb/routes/postRoutes.js';
 import dalleRoutes from './mongodb/routes/dalleRoutes.js';
 import path from 'path';
 import express from 'express';
+
+
 // Load environment variables
 dotenv.config();
 
+// Create an Express application
 const app = express();
 
-// Middleware for CORS
+
+// Define the allowed frontend origin
+const allowedOrigins = ['http://localhost:3000',"http://localhost","https://mindcraftai.live"];
+
+// CORS options to only allow GET and POST methods from the allowed origin
 const corsOptions = {
-    origin: '*', // Allow all origins (or specify your NGINX domain)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  };
+  origin: (origin, callback) => {
+    // Allow the origin if it matches the frontend domain, or if there is no origin (e.g., for local development)
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST'],  // Allow only GET and POST methods
+  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers for the request
+};
+
+
+// Use the CORS middleware with the defined options
 app.use(cors(corsOptions));
 
 // Middleware to parse JSON
@@ -26,15 +43,6 @@ app.use(express.json({ limit: '50mb' }));
 app.use('/api/v1/post', postRoutes);
 app.use('/api/v1/dalle', dalleRoutes);
 
-// Serve React frontend in production
-if (process.env.NODE_ENV === 'production') {
-    const __dirname = path.resolve();
-    app.use(express.static(path.join(__dirname, 'frontend/build')));
-
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
-    });
-}
 
 // Simple test route
 app.get('/', (req, res) => {

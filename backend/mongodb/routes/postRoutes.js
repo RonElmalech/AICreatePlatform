@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'; 
 import * as dotenv from 'dotenv';
 import { Storage } from '@google-cloud/storage';
 import Post from '../models/post.js';
@@ -6,30 +6,32 @@ import fs from 'fs';
 
 dotenv.config();
 
-
-
 const router = express.Router();
 
-// Ensure the environment variable for the credentials file path is defined
-const credentialsPath = process.env.GCLOUD_KEY_FILE_PATH;
+// Ensure GCLOUD_CREDENTIALS_BASE64 environment variable is defined
+const base64Credentials = process.env.GCLOUD_CREDENTIALS_BASE64;
 
-if (!credentialsPath) {
-    throw new Error('GCLOUD_KEY_FILE_PATH is not defined in environment variables.');
+
+if (!base64Credentials) {
+    throw new Error('GCLOUD_CREDENTIALS_BASE64 is not defined in environment variables.');
 }
 
-let googleCredentials;
-
-// Try reading and parsing the credentials file
-try {
-    const fileContent = fs.readFileSync(credentialsPath, 'utf-8');
-    googleCredentials = JSON.parse(fileContent);
-} catch (error) {
-    console.error('Error reading or parsing GCLOUD_KEY_FILE_PATH:', error.message);
-    throw error; // Stop the server if credentials cannot be loaded
+// Function to add padding to the Base64 string
+function addBase64Padding(base64String) {
+    const padding = base64String.length % 4 === 0 ? 0 : 4 - (base64String.length % 4);
+    return base64String + '='.repeat(padding);
 }
 
+// Re-add padding to the credentials
+const base64CredentialsWithPadding = addBase64Padding(base64Credentials);
+
+// Decode the base64 credentials and parse it as JSON
+const credentialsJson = Buffer.from(base64CredentialsWithPadding, 'base64').toString('utf8');
+const credentials = JSON.parse(credentialsJson);
+
+// Initialize Google Cloud Storage client using the decoded credentials
 const storage = new Storage({
-    credentials: googleCredentials, // Use the loaded credentials
+    credentials, // Use the decoded JSON credentials
     projectId: process.env.GCLOUD_PROJECT_ID, // Your project ID
 });
 

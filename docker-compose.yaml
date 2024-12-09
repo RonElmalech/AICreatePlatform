@@ -1,0 +1,54 @@
+services:
+  # Frontend (Build the Vite app)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - vite-build:/usr/share/nginx/html
+    networks:
+      - app-network
+    container_name: frontend
+    depends_on:
+      - backend
+
+  # Backend (API)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    container_name: backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+    env_file:
+      - .env # Load environment variables
+
+  # Nginx (Serving the built frontend)
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443" # SSL port - for local development remove this line
+    depends_on:
+      - frontend
+    volumes:
+      - vite-build:/usr/share/nginx/html
+      - /etc/ssl/certs:/etc/ssl/certs # SSL certifcation path - for local development remove this line
+      - /etc/ssl/private:/etc/ssl/private # SSL certifcation path - for local development remove this line
+    networks:
+      - app-network
+    container_name: nginx
+
+volumes:
+  vite-build:
+
+networks:
+  app-network:
+    driver: bridge
