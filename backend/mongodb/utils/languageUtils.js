@@ -1,54 +1,40 @@
 import axios from 'axios';
-import { franc } from 'franc-min';
 
 const API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 
-// Language code mapping for Cloudflare model
-const languageMapping = {
-    'eng': 'en', // English
-    'heb': 'he', // Hebrew
-    // Add other languages as needed
-};
+// Cloudflare model URL for auto-detection and translation (this handles both auto-detection and translation to English)
+const CF_API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/@cf/meta/m2m100-1.2b`;
 
-// Function to detect language and translate if necessary
 export async function detectAndTranslate(prompt) {
     try {
         if (!prompt) {
             throw new Error('Prompt is required');
         }
 
-        // Detect the language of the prompt
-        const detectedLang = franc(prompt);
-        const language = languageMapping[detectedLang] || 'en'; // Default to English if language is not supported
+        // Send the prompt to Cloudflare's model for language detection and translation
+        console.log("Sending prompt for auto-detection and translation...");
 
-        console.log("Detected language:", detectedLang, "Mapped language:", language);
-
-        // If the detected language is not English, translate it to English using Cloudflare model
-        let translatedPrompt = prompt;
-        if (language !== 'en') {
-            console.log("Translating prompt to English...");
-
-            const translationResponse = await axios.post(
-                `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/@cf/meta/m2m100-1.2b`,
-                { text: prompt, target_language: 'en' },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${API_TOKEN}`,
-                    }
+        const response = await axios.post(
+            CF_API_URL,
+            { text: prompt, target_language: 'en' },  // Auto-detect language and translate to English
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${API_TOKEN}`,
                 }
-            );
-
-            if (translationResponse.status === 200 && translationResponse.data && translationResponse.data.translation) {
-                translatedPrompt = translationResponse.data.translation;
-                console.log("Translated prompt:", translatedPrompt);
-            } else {
-                throw new Error('Error translating text');
             }
-        }
+        );
 
-        return { translatedPrompt, language };  // Return translated prompt and language
+        if (response.status === 200 && response.data && response.data.translation) {
+            const translatedPrompt = response.data.translation;
+            const language = response.data.detected_language || 'en';  // Extract detected language
+            console.log("Translated prompt:", translatedPrompt);
+            console.log("Detected language:", language);
+            return { translatedPrompt, language };  // Return translated prompt and detected language
+        } else {
+            throw new Error('Error translating text');
+        }
     } catch (error) {
         console.error("Error in language detection/translation:", error.message);
         throw error;

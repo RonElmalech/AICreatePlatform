@@ -1,7 +1,7 @@
 import express from 'express'; 
 import * as dotenv from 'dotenv';
 import axios from 'axios'; // Import axios
-import { detectAndTranslate } from '../utils/languageUtils.js'; // Import the language utility
+import { detectAndTranslate } from '../utils/languageUtils.js'; // Import the updated language utility
 
 dotenv.config(); 
 
