@@ -1,7 +1,7 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
 import axios from 'axios'; // Import axios
-import franc from 'franc-min'; // Import franc-min for language detection
+import {franc} from 'franc-min'; // Import franc-min for language detection
 
 dotenv.config(); 
 
