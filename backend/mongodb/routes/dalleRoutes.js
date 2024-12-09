@@ -1,7 +1,7 @@
-import express from 'express';
+import express from 'express'; 
 import * as dotenv from 'dotenv';
 import axios from 'axios'; // Import axios
-import {franc} from 'franc-min'; // Import franc-min for language detection
+import { detectAndTranslate } from '../utils/languageUtils.js'; // Import the language utility
 
 dotenv.config(); 
 
@@ -11,13 +11,6 @@ const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const MODEL_ID = process.env.CLOUDFLARE_MODEL_ID;
 const CF_API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/${MODEL_ID}`;
 
-// Language code mapping for Cloudflare model
-const languageMapping = {
-    'eng': 'en', // English
-    'heb': 'he', // Hebrew
-    // Add other languages as needed
-};
-
 router.route('/generate-image').post(async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -25,33 +18,15 @@ router.route('/generate-image').post(async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        // Detect the language of the prompt
-        const detectedLang = franc(prompt);
-        const language = languageMapping[detectedLang] || 'en'; // Default to English if language is not supported
+        console.log("Received prompt:", prompt);
 
-        // If the detected language is not English, translate it to English using Cloudflare model
-        let translatedPrompt = prompt;
-        if (language !== 'en') {
-            const translationResponse = await axios.post(
-                `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/@cf/meta/m2m100-1.2b`,
-                { text: prompt, target_language: 'en' }, // Translating to English
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${API_TOKEN}`,
-                    }
-                }
-            );
-
-            if (translationResponse.status === 200 && translationResponse.data && translationResponse.data.translation) {
-                translatedPrompt = translationResponse.data.translation;
-            } else {
-                throw new Error('Error translating text');
-            }
-        }
+        // Use the utility function to detect and translate the prompt
+        const { translatedPrompt, language } = await detectAndTranslate(prompt);
 
         // Call Cloudflare API to generate an image using the translated prompt
         const input = { prompt: translatedPrompt, language };
+        console.log("Sending request to Cloudflare API with input:", input);
+
         const response = await axios.post(CF_API_URL, input, {
             headers: {
                 'Content-Type': 'application/json',
@@ -64,19 +39,22 @@ router.route('/generate-image').post(async (req, res) => {
             throw new Error('Error generating image from Cloudflare API');
         }
 
-        // Check for the image response
+        console.log("Received response from Cloudflare API:", response.status);
+
         const contentType = response.headers['content-type'];
+        console.log("Response content type:", contentType);
+
         if (contentType && contentType.startsWith('image/')) {
-            // Convert the image to base64
             const base64Image = `data:${contentType};base64,${Buffer.from(response.data, 'binary').toString('base64')}`;
             return res.status(200).json({ imageBase64: base64Image });
         } else {
             const result = response.data;
+            console.log("Unexpected response format:", result);
             throw new Error(result.error || 'Unexpected response format');
         }
 
     } catch (error) {
-        console.error(error);
+        console.error("Error occurred:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
