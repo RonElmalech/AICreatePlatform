@@ -16,7 +16,7 @@ const app = express();
 
 
 // Define the allowed frontend origin
-const allowedOrigins = ['http://localhost:3000',"http://localhost"];
+const allowedOrigins = ['http://localhost:3000',"http://localhost","http://mindcraftai.live"];
 
 // CORS options to only allow GET and POST methods from the allowed origin
 const corsOptions = {
