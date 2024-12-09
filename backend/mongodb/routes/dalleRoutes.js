@@ -1,7 +1,7 @@
 import express from 'express'; 
 import * as dotenv from 'dotenv';
 import axios from 'axios'; // Import axios
-import { detectAndTranslate } from '../utils/languageUtils.js'; // Import the updated language utility
+import { detectAndTranslate } from '../utils/languageUtils.js'; // Import the language utility
 
 dotenv.config(); 
 
@@ -21,10 +21,10 @@ router.route('/generate-image').post(async (req, res) => {
         console.log("Received prompt:", prompt);
 
         // Use the utility function to detect and translate the prompt
-        const { translatedPrompt, language } = await detectAndTranslate(prompt);
+        const { translatedPrompt, detectedLang } = await detectAndTranslate(prompt);
 
         // Call Cloudflare API to generate an image using the translated prompt
-        const input = { prompt: translatedPrompt, language };
+        const input = { prompt: translatedPrompt, language: 'en' };  // Always send 'en' for image generation
         console.log("Sending request to Cloudflare API with input:", input);
 
         const response = await axios.post(CF_API_URL, input, {

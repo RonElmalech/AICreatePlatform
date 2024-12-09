@@ -1,10 +1,14 @@
-import axios from 'axios';
+import { TranslationServiceClient } from '@google-cloud/translate';
 
-const API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
-const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
+// Instantiate the Google Translate client
+const client = new TranslationServiceClient();
 
-// Cloudflare model URL for auto-detection and translation (this handles both auto-detection and translation to English)
-const CF_API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/@cf/meta/m2m100-1.2b`;
+// Set up the Google Cloud project and API key
+const projectId = process.env.GCLOUD_PROJECT_ID; // Replace with your Google Cloud project ID
+const apiKey = process.env.GCLOUD_API_KEY; // Replace with your API key
+const location = 'global'; // Google Translation API location (e.g., 'global')
+
+const parent = `projects/${projectId}/locations/${location}`;
 
 export async function detectAndTranslate(prompt) {
     try {
@@ -12,29 +16,34 @@ export async function detectAndTranslate(prompt) {
             throw new Error('Prompt is required');
         }
 
-        // Send the prompt to Cloudflare's model for language detection and translation
-        console.log("Sending prompt for auto-detection and translation...");
+        // Step 1: Detect the language of the input prompt
+        const [detection] = await client.detectLanguage({
+            parent,
+            content: prompt,
+        });
 
-        const response = await axios.post(
-            CF_API_URL,
-            { text: prompt, target_language: 'en' },  // Auto-detect language and translate to English
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${API_TOKEN}`,
-                }
-            }
-        );
+        const detectedLang = detection.languages[0].languageCode; // Get detected language
+        console.log("Detected language:", detectedLang);
 
-        if (response.status === 200 && response.data && response.data.translation) {
-            const translatedPrompt = response.data.translation;
-            const language = response.data.detected_language || 'en';  // Extract detected language
+        // Step 2: If the detected language is not English, translate it to English
+        let translatedPrompt = prompt;
+        if (detectedLang !== 'en') {
+            console.log("Translating prompt to English...");
+
+            const [translation] = await client.translateText({
+                parent,
+                contents: [prompt],
+                sourceLanguageCode: detectedLang,
+                targetLanguageCode: 'en',
+                mimeType: 'text/plain',
+                apiKey: apiKey, // Use the API key here
+            });
+
+            translatedPrompt = translation.translations[0].translatedText;
             console.log("Translated prompt:", translatedPrompt);
-            console.log("Detected language:", language);
-            return { translatedPrompt, language };  // Return translated prompt and detected language
-        } else {
-            throw new Error('Error translating text');
         }
+
+        return { translatedPrompt, language: detectedLang };  // Return translated prompt and language
     } catch (error) {
         console.error("Error in language detection/translation:", error.message);
         throw error;
