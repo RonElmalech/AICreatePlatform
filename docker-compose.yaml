@@ -40,6 +40,8 @@ services:
       - frontend
     volumes:
       - vite-build:/usr/share/nginx/html
+      - /etc/ssl/certs:/etc/ssl/certs
+      - /etc/ssl/private:/etc/ssl/private
     networks:
       - app-network
     container_name: nginx
