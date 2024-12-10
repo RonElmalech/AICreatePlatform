@@ -21,6 +21,14 @@ const Home = () => {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [searchText, setSearchText] = useState('');
   const isFetching = useRef(false); // Ref to prevent duplicate fetches
+  const [editingPost, setEditingPost] = useState(null);
+  const [newPrompt, setNewPrompt] = useState("");
+
+  // Function to detect if the text is in Hebrew
+  const isHebrew = (text) => {
+    const hebrewRegex = /[\u0590-\u05FF]/;
+    return hebrewRegex.test(text);
+  };
 
   const handleSearchChange = (e) => {
     clearTimeout(searchTimeout);
@@ -37,11 +45,19 @@ const Home = () => {
     );
   };
 
+  const handleEditPrompt = (postId, prompt) => {
+    setEditingPost(postId);
+    setNewPrompt(prompt);
+  };
+
+  const handleSavePrompt = (postId) => {
+    // Save the new prompt here (e.g., update the post in the database)
+    setEditingPost(null);
+  };
+
   useEffect(() => {
     if (!isFetching.current) {
       isFetching.current = true; // Prevent duplicate fetches
-     
-       
       const fetchPosts = async () => {
         setLoading(true);
         try {
@@ -102,6 +118,76 @@ const Home = () => {
             </div>
           </>
         )}
+      </div>
+
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {allPosts.map((post) => {
+          const isPostHebrew = isHebrew(post.prompt);
+          return (
+            <div
+              key={post._id}
+              className={`post hover:bg-gray-100 p-4 rounded-lg ${isPostHebrew ? 'rtl' : ''}`}
+            >
+              <div className={`post-content ${isPostHebrew ? 'text-right' : 'text-left'}`}>
+                {editingPost === post._id ? (
+                  <div>
+                    <textarea
+                      value={newPrompt}
+                      onChange={(e) => setNewPrompt(e.target.value)}
+                      className="prompt-edit-input p-2 border rounded w-full"
+                    />
+                    <button
+                      onClick={() => handleSavePrompt(post._id)}
+                      className="save-btn bg-blue-500 text-white p-2 rounded mt-2"
+                    >
+                      Save
+                    </button>
+                  </div>
+                ) : (
+                  <p
+                    className={`prompt-text ${isPostHebrew ? 'text-right' : ''}`}
+                    style={{ direction: isPostHebrew ? 'rtl' : 'ltr' }}
+                  >
+                    {post.prompt}
+                  </p>
+                )}
+              </div>
+              <div className="user-info flex items-center">
+                <div className="user-photo rounded-full bg-green-500 text-white flex items-center justify-center w-8 h-8">
+                  {post.name[0].toUpperCase()}
+                </div>
+                <div className={`user-name ml-2 ${isPostHebrew ? 'text-right' : ''}`}>
+                  {post.name}
+                </div>
+              </div>
+              <div className="post-actions flex justify-between mt-4">
+                {editingPost === post._id ? (
+                  <button
+                    onClick={() => handleSavePrompt(post._id)}
+                    className="save-btn bg-blue-500 text-white p-2 rounded"
+                  >
+                    Save
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleEditPrompt(post._id, post.prompt)}
+                      className="edit-btn bg-yellow-500 text-white p-2 rounded"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => alert("Downloading image...")}
+                      className="download-btn bg-green-500 text-white p-2 rounded"
+                    >
+                      Download
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
