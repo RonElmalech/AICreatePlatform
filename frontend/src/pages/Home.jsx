@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader, Card, FormField } from '../components';
 import axios from 'axios';
-import LanguageSwitcher from '../components/LanguageSwitcher';
+import './Home.css'; // Import the CSS file
 
 // Language texts
 const texts = {
@@ -31,7 +31,7 @@ const RenderCards = ({ data, title }) => {
   }
 
   return (
-    <h2 className="mt-5 font-bold text-blue-500 text-xl uppercase">{title}</h2>
+    <h2 className="no-results">{title}</h2>
   );
 };
 
@@ -88,25 +88,24 @@ const Home = () => {
   }, []);
 
   return (
-    <section className="max-w-7xl mx-auto py-8 px-4 bg-gray-900 text-white">
+    <section className="container">
+      {/* Language Switcher (flags on top right) */}
+      <div className="language-switcher">
+        <button onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}>
+          {language === 'en' ? '🇮🇱' : '🇬🇧'}
+        </button>
+      </div>
+
       <div>
-        <h1
-          className={`font-extrabold text-4xl mb-4 ${
-            language === 'he' ? 'text-right' : ''
-          }`}
-        >
+        <h1 className={`title ${language === 'he' ? 'text-right' : ''}`}>
           {texts[language].title}
         </h1>
-        <p
-          className={`text-lg text-gray-300 max-w-4xl mb-6 ${
-            language === 'he' ? 'text-right' : ''
-          }`}
-        >
+        <p className={`description ${language === 'he' ? 'text-right' : ''}`}>
           {texts[language].description}
         </p>
       </div>
 
-      <div className="mt-8">
+      <div className="search-field">
         <FormField
           labelName={texts[language].searchPlaceholder}
           type="text"
@@ -117,7 +116,7 @@ const Home = () => {
         />
       </div>
 
-      <div className="mt-10">
+      <div className="card-section">
         {loading ? (
           <div className="flex justify-center items-center">
             <Loader />
@@ -129,7 +128,7 @@ const Home = () => {
                 {texts[language].showingResults} <span className="text-white">{searchText}</span>
               </h2>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="card-section">
               {searchText ? (
                 <RenderCards data={searchedResults} title={texts[language].noResults} />
               ) : (

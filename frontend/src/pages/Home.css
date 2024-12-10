@@ -1,0 +1,92 @@
+/* General Styles */
+body {
+    background-color: #1a202c; /* Dark background */
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Headings */
+  h1 {
+    font-weight: 800;
+    font-size: 2rem;
+    color: #f1f5f9;
+    margin-bottom: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+    color: #a0aec0;
+  }
+  
+  p {
+    color: #cbd5e0;
+    font-size: 1.125rem;
+    max-width: 700px;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Language Switcher */
+  .language-switcher {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .language-switcher button {
+    padding: 0.5rem;
+    background-color: #edf2f7;
+    border-radius: 9999px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .language-switcher button:hover {
+    background-color: #e2e8f0;
+  }
+  
+  /* Search Field */
+  .search-field {
+    margin-top: 4rem;
+  }
+  
+  .search-field input {
+    padding: 0.75rem;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #2d3748;
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .search-field input:focus {
+    outline: none;
+    border-color: #4fd1c5;
+    background-color: #4a5568;
+  }
+  
+  /* Card Section */
+  .card-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .no-posts,
+  .no-results {
+    font-weight: bold;
+    color: #4fd1c5;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+  }
+  

@@ -3,41 +3,27 @@ import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
 import { Home, CreatePost } from './pages';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import logo from './assets/MindCraft-logo.png';
+import './App.css'; // Import the CSS file
 
 const App = () => {
   const [language, setLanguage] = useState('en');
 
   return (
     <BrowserRouter>
-      {/* Top Bar */}
-      <header className="flex justify-between items-center px-6 py-4 bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-        <div className="flex items-center space-x-8">
-          {/* Logo */}
+      <header className="top-bar">
+        <div className="top-bar-left">
           <Link to="/">
-            <img src={logo} alt="MindCraft Logo" className="w-32 object-contain" />
+            <img src={logo} alt="MindCraft Logo" className="logo" />
           </Link>
-          {/* Navigation Links */}
-          <nav className="hidden sm:flex space-x-6">
-            <Link
-              to="/"
-              className="text-lg font-semibold text-gray-300 hover:text-white transition"
-            >
-              {language === 'he' ? 'בית' : 'Home'}
-            </Link>
-            <Link
-              to="/generate"
-              className="text-lg font-semibold text-gray-300 hover:text-white transition"
-            >
-              {language === 'he' ? 'יצירת תמונה' : 'Generate Image'}
-            </Link>
+          <nav className="nav-links">
+            <Link to="/" className="nav-link">{language === 'he' ? 'בית' : 'Home'}</Link>
+            <Link to="/generate" className="nav-link">{language === 'he' ? 'יצירת תמונה' : 'Generate Image'}</Link>
           </nav>
         </div>
-        {/* Language Switcher */}
         <LanguageSwitcher language={language} setLanguage={setLanguage} />
       </header>
 
-      {/* Main Content */}
-      <main className="w-full p-8 bg-gray-800 text-gray-100 min-h-[calc(100vh-73px)]">
+      <main className="main-content">
         <Routes>
           <Route path="/" element={<Home language={language} />} />
           <Route path="/generate" element={<CreatePost language={language} />} />
