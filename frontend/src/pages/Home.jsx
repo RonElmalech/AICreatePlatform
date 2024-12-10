@@ -127,6 +127,7 @@ const Home = () => {
             <div
               key={post._id}
               className={`post hover:bg-gray-100 p-4 rounded-lg ${isPostHebrew ? 'rtl' : ''}`}
+              style={{ textAlign: isPostHebrew ? 'right' : 'left' }}
             >
               <div className={`post-content ${isPostHebrew ? 'text-right' : 'text-left'}`}>
                 {editingPost === post._id ? (
@@ -152,14 +153,17 @@ const Home = () => {
                   </p>
                 )}
               </div>
-              <div className="user-info flex items-center">
-                <div className="user-photo rounded-full bg-green-500 text-white flex items-center justify-center w-8 h-8">
+
+              <div className="user-info flex items-center justify-between">
+                <div className={`user-photo ${isPostHebrew ? 'ml-2' : 'mr-2'} rounded-full bg-green-500 text-white flex items-center justify-center w-8 h-8`}>
                   {post.name[0].toUpperCase()}
                 </div>
-                <div className={`user-name ml-2 ${isPostHebrew ? 'text-right' : ''}`}>
+
+                <div className={`user-name ${isPostHebrew ? 'mr-2' : 'ml-2'} ${isPostHebrew ? 'text-right' : ''}`}>
                   {post.name}
                 </div>
               </div>
+
               <div className="post-actions flex justify-between mt-4">
                 {editingPost === post._id ? (
                   <button
@@ -178,7 +182,7 @@ const Home = () => {
                     </button>
                     <button
                       onClick={() => alert("Downloading image...")}
-                      className="download-btn bg-green-500 text-white p-2 rounded"
+                      className={`download-btn bg-green-500 text-white p-2 rounded ${isPostHebrew ? 'ml-2' : 'mr-2'}`}
                     >
                       Download
                     </button>
