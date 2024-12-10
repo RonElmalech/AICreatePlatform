@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 
 const Dashboard = ({ language }) => {
   return (
-    <div className={`fixed top-0 ${language === 'he' ? 'right-0' : 'left-0'} w-64 h-full bg-gray-800 text-white p-5`}>
+    <div
+      className={`fixed top-0 ${language === 'he' ? 'right-0' : 'left-0'} w-64 h-full bg-gray-800 text-white p-5 transition-transform duration-300`}
+    >
       <h2 className="text-xl font-bold mb-4">{language === 'he' ? 'לוח בקרה' : 'Dashboard'}</h2>
       <ul>
         <li>

@@ -1,15 +1,34 @@
-// src/components/LanguageSwitcher.js
 import React from 'react';
+import israelFlag from '../assets/israel.png';
+import usaFlag from '../assets/usa.png';
 
 const LanguageSwitcher = ({ language, setLanguage }) => {
   return (
-    <div className="flex justify-end items-center space-x-4">
-      <button onClick={() => setLanguage('en')} className="mr-2">
-        <img src="/path/to/english-flag.svg" alt="English" width="24" />
+    <div className="relative">
+      <button className="flex items-center px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+        <img
+          src={`/assets/${language === 'he' ? 'israel' : 'usa'}.png`}
+          alt={language === 'he' ? 'Hebrew' : 'English'}
+          className="w-6 h-6 mr-2"
+        />
+        {language === 'he' ? 'עברית' : 'English'}
       </button>
-      <button onClick={() => setLanguage('he')}>
-        <img src="/path/to/hebrew-flag.svg" alt="Hebrew" width="24" />
-      </button>
+      <div className="absolute mt-2 bg-white shadow-lg rounded hidden group-hover:block">
+        <button
+          onClick={() => setLanguage('en')}
+          className="flex items-center px-4 py-2 hover:bg-gray-100"
+        >
+          <img src={usaFlag} alt="English" className="w-6 h-6 mr-2" />
+          English
+        </button>
+        <button
+          onClick={() => setLanguage('he')}
+          className="flex items-center px-4 py-2 hover:bg-gray-100"
+        >
+          <img src={israelFlag} alt="Hebrew" className="w-6 h-6 mr-2" />
+          עברית
+        </button>
+      </div>
     </div>
   );
 };
