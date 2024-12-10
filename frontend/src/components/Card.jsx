@@ -3,8 +3,11 @@ import download from '../assets/download.png';
 import { downloadImage } from '../utils';
 
 const Card = ({ _id, name, prompt, photo }) => {
-  // Function to check if the prompt is in Hebrew
-  const isHebrew = (text) => /[\u0590-\u05FF]/.test(text);
+  // Updated function to check if the prompt is entirely Hebrew
+  const isHebrew = (text) => {
+    // This regex checks if the string contains only Hebrew letters and spaces
+    return /^[\u0590-\u05FF\s]+$/.test(text);
+  };
 
   const isPostHebrew = isHebrew(prompt);
 
