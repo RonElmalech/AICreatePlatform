@@ -1,7 +1,8 @@
 import express from 'express'; 
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv'; 
 import axios from 'axios'; // Import axios
 import { detectAndTranslate } from '../utils/languageUtils.js'; // Import the language utility
+import { decodeBase64Credentials } from '../utils/gcloudauth.js'; // Import the base64 credentials utility
 
 dotenv.config(); 
 
@@ -10,6 +11,25 @@ const API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const MODEL_ID = process.env.CLOUDFLARE_MODEL_ID;
 const CF_API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/${MODEL_ID}`;
+
+// Use the base64 credentials decoding utility for Translate API
+const base64Credentials = process.env.GCLOUD_CREDENTIALS_BASE64;
+
+if (!base64Credentials) {
+    throw new Error('GCLOUD_CREDENTIALS_BASE64 is not defined in environment variables.');
+}
+
+const credentials = decodeBase64Credentials(base64Credentials);
+
+// Create Google Translate client using the decoded credentials
+import { TranslationServiceClient } from '@google-cloud/translate';
+const translateClient = new TranslationServiceClient({
+    credentials, // Use the decoded credentials
+    projectId: process.env.GCLOUD_PROJECT_ID, // Your Google Cloud project ID
+});
+
+const location = 'global';
+const parent = `projects/${process.env.GCLOUD_PROJECT_ID}/locations/${location}`;
 
 router.route('/generate-image').post(async (req, res) => {
     try {
@@ -21,7 +41,7 @@ router.route('/generate-image').post(async (req, res) => {
         console.log("Received prompt:", prompt);
 
         // Use the utility function to detect and translate the prompt
-        const { translatedPrompt, detectedLang } = await detectAndTranslate(prompt);
+        const { translatedPrompt, detectedLang } = await detectAndTranslate(translateClient, prompt);
 
         // Call Cloudflare API to generate an image using the translated prompt
         const input = { prompt: translatedPrompt, language: 'en' };  // Always send 'en' for image generation
