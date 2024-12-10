@@ -7,7 +7,7 @@ const texts = {
   en: {
     title: "Welcome to Mind Craft AI: Unleash Your Creativity",
     description:
-      "Mind Craft AI is a vibrant community where innovation and creativity converge. Explore an exceptional collection of AI-generated artworks, inspire others, and let your imagination run wild. Whether you're an artist, a tech enthusiast, or someone looking to discover new possibilities, Mind Craft AI is the perfect space to connect, share, and create together.",
+      "Mind Craft AI is a community where creativity meets innovation. Explore a collection of stunning AI-generated artworks, connect, and share your imagination.",
     searchPlaceholder: "Search posts by name or prompt",
     noResults: "No search results found",
     noPosts: "No posts available",
@@ -16,7 +16,7 @@ const texts = {
   he: {
     title: "ברוכים הבאים ל-Mind Craft AI: שחררו את היצירתיות שלכם",
     description:
-      "Mind Craft AI היא קהילה תוססת בה חדשנות ויצירתיות נפגשות. גלו אוסף יוצא דופן של יצירות אמנות שנוצרו על ידי בינה מלאכותית, השרו השראה על אחרים ותנו לדמיון שלכם להתפרע. אם אתם אמנים, חובבי טכנולוגיה או פשוט מחפשים לגלות אפשרויות חדשות, Mind Craft AI הוא המקום המושלם להתחבר, לשתף וליצור יחד.",
+      "Mind Craft AI היא קהילה בה יצירתיות וחדשנות נפגשות. גלו אוסף מרהיב של יצירות אמנות שנוצרו על ידי בינה מלאכותית, התחברו ושתפו את הדמיון שלכם.",
     searchPlaceholder: "חפש פוסטים לפי שם או תיאור",
     noResults: "לא נמצאו תוצאות חיפוש",
     noPosts: "אין פוסטים זמינים",
@@ -90,22 +90,30 @@ const Home = () => {
   }, []);
 
   return (
-    <section className="max-w-7xl mx-auto">
-      <div>
-        <h1 className="font-extrabold text-[#222328] text-[32px]">{texts[language].title}</h1>
-        <p className="mt-2 text-[#666e75] text-[16px] max-w-[500px]">
-          {texts[language].description}
-        </p>
-      </div>
-
-      {/* Language Switcher */}
-      <div className="mt-4">
+    <section className="max-w-7xl mx-auto relative">
+      {/* Language Switcher (flags on top right) */}
+      <div className="absolute top-4 right-4 flex space-x-2">
         <button
           onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
         >
-          {language === 'en' ? 'עברית' : 'English'}
+          {language === 'en' ? '🇮🇱' : '🇬🇧'}
         </button>
+      </div>
+
+      <div>
+        <h1
+          className={`font-extrabold text-[#222328] text-[32px] ${language === 'he' ? 'text-right' : ''}`}
+        >
+          {texts[language].title}
+        </h1>
+        <p
+          className={`mt-2 text-[#666e75] text-[16px] max-w-[700px] ${
+            language === 'he' ? 'text-right' : ''
+          }`}
+        >
+          {texts[language].description}
+        </p>
       </div>
 
       <div className="mt-16">
