@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader, Card, FormField } from '../components';
 import axios from 'axios';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 // Language texts
 const texts = {
@@ -30,9 +31,7 @@ const RenderCards = ({ data, title }) => {
   }
 
   return (
-    <h2 className="mt-5 font-bold text-[#6469ff] text-xl uppercase">
-      {title}
-    </h2>
+    <h2 className="mt-5 font-bold text-blue-500 text-xl uppercase">{title}</h2>
   );
 };
 
@@ -60,7 +59,6 @@ const Home = () => {
     );
   };
 
-  // Auto detect user language (if preferred)
   useEffect(() => {
     const userLanguage = navigator.language.includes('he') ? 'he' : 'en';
     setLanguage(userLanguage);
@@ -90,25 +88,17 @@ const Home = () => {
   }, []);
 
   return (
-    <section className="max-w-7xl mx-auto relative">
-      {/* Language Switcher (flags on top right) */}
-      <div className="absolute top-4 right-4 flex space-x-2">
-        <button
-          onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
-          className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-        >
-          {language === 'en' ? '🇮🇱' : '🇬🇧'}
-        </button>
-      </div>
-
+    <section className="max-w-7xl mx-auto py-8 px-4 bg-gray-900 text-white">
       <div>
         <h1
-          className={`font-extrabold text-[#222328] text-[32px] ${language === 'he' ? 'text-right' : ''}`}
+          className={`font-extrabold text-4xl mb-4 ${
+            language === 'he' ? 'text-right' : ''
+          }`}
         >
           {texts[language].title}
         </h1>
         <p
-          className={`mt-2 text-[#666e75] text-[16px] max-w-[700px] ${
+          className={`text-lg text-gray-300 max-w-4xl mb-6 ${
             language === 'he' ? 'text-right' : ''
           }`}
         >
@@ -116,7 +106,7 @@ const Home = () => {
         </p>
       </div>
 
-      <div className="mt-16">
+      <div className="mt-8">
         <FormField
           labelName={texts[language].searchPlaceholder}
           type="text"
@@ -135,11 +125,11 @@ const Home = () => {
         ) : (
           <>
             {searchText && (
-              <h2 className="font-medium text-[#666e75] text-xl mb-3">
-                {texts[language].showingResults} <span className="text-[#222328]">{searchText}</span>
+              <h2 className="font-medium text-gray-400 text-xl mb-3">
+                {texts[language].showingResults} <span className="text-white">{searchText}</span>
               </h2>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {searchText ? (
                 <RenderCards data={searchedResults} title={texts[language].noResults} />
               ) : (
