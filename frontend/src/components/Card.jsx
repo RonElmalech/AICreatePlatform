@@ -8,20 +8,19 @@ const isHebrew = (text) => {
 };
 
 const Card = ({ _id, name, prompt, photo }) => {
-  // Check if the prompt text contains Hebrew characters
-  const isPostHebrew = isHebrew(prompt);
-  console.log('prompt:', prompt);
-  console.log('Is prompt Hebrew:', isPostHebrew);  // Log to verify Hebrew detection
-    // Log to verify Hebrew detection
+  // Check if the prompt and name text contain Hebrew characters
+  const isPromptHebrew = isHebrew(prompt);
+  const isNameHebrew = isHebrew(name);
 
-  // Determine the direction based on Hebrew or English
-  const textDirection = isPostHebrew ? 'rtl' : 'ltr';
-  const alignmentClass = isPostHebrew ? 'text-right' : 'text-left';
+  // Determine the direction based on Hebrew or English for the prompt
+  const promptTextDirection = isPromptHebrew ? 'rtl' : 'ltr';
+  const promptAlignmentClass = isPromptHebrew ? 'text-right' : 'text-left';
 
-  // Adjust classes for elements based on Hebrew detection
-  const nameAlignmentClass = isPostHebrew ? 'mr-2' : 'ml-2';
-  const buttonAlignmentClass = isPostHebrew ? 'ml-2' : 'mr-2';
-  const namePositionClass = isPostHebrew ? 'flex-row-reverse' : 'flex-row';
+  // If name is Hebrew, change all the layout elements (name, photo, download button) to RTL
+  const layoutDirectionClass = isNameHebrew ? 'flex-row-reverse' : 'flex-row';
+  const nameAlignmentClass = isNameHebrew ? 'mr-2' : 'ml-2';
+  const buttonAlignmentClass = isNameHebrew ? 'ml-2' : 'mr-2';
+  const textAlignmentClass = isNameHebrew ? 'text-right' : 'text-left';
 
   return (
     <div className="rounded-xl group relative shadow-card hover:shadow-cardhover card min-h-[300px]">
@@ -31,23 +30,23 @@ const Card = ({ _id, name, prompt, photo }) => {
         alt={prompt}
       />
       <div className="group-hover:flex flex-col max-h-[94.5%] hidden absolute bottom-0 left-0 right-0 bg-[#10131f] m-2 p-4 rounded-md">
-        {/* Apply RTL for Hebrew and LTR for English */}
+        {/* Apply RTL only for Hebrew prompt text */}
         <p
-          className={`text-white text-md overflow-y-auto prompt ${alignmentClass}`}
+          className={`text-white text-md overflow-y-auto prompt ${promptAlignmentClass}`}
           style={{
-            direction: textDirection, // Apply text direction based on Hebrew detection
+            direction: promptTextDirection, // Apply text direction based on Hebrew detection for prompt
           }}
         >
           {prompt}
         </p>
-        <div className={`mt-5 flex justify-between items-center gap-2 ${namePositionClass}`}>
-          <div className={`flex items-center gap-2 ${isPostHebrew ? 'flex-row-reverse' : ''}`}>
+        <div className={`mt-5 flex justify-between items-center gap-2 ${layoutDirectionClass}`}>
+          <div className={`flex items-center gap-2 ${layoutDirectionClass}`}>
             <div
               className={`w-7 h-7 rounded-full object-cover bg-green-700 flex justify-center items-center text-white text-xs font-bold ${nameAlignmentClass}`}
             >
               {name[0]}
             </div>
-            <p className={`text-white text-sm ${alignmentClass}`}>
+            <p className={`text-white text-sm ${textAlignmentClass}`}>
               {name}
             </p>
           </div>
