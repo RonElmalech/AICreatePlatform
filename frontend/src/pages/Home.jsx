@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader, Card, FormField } from '../components';
 import axios from 'axios';
-import './Home.css'; // Import the CSS file
 
-// Language texts
 const texts = {
   en: {
     title: "Welcome to Mind Craft AI: Unleash Your Creativity",
     description:
       "Mind Craft AI is a community where creativity meets innovation. Explore a collection of stunning AI-generated artworks, connect, and share your imagination.",
     searchPlaceholder: "Search posts by name or prompt",
-    noResults: "No search results found",
-    noPosts: "No posts available",
+    noResults: "NO SEARCH RESULTS FOUND",
+    noPosts: "NO POSTS AVAILABLE",
     showingResults: "Displaying results for",
   },
   he: {
@@ -25,23 +23,26 @@ const texts = {
   },
 };
 
-const RenderCards = ({ data, title }) => {
+const RenderCards = ({ data, noResultsText, language }) => {
   if (data?.length > 0) {
-    return data.map((post) => <Card key={post._id} {...post} />);
+    return data.map((post) => <Card key={post._id} {...post} language={language} />);
   }
 
   return (
-    <h2 className="no-results">{title}</h2>
+    <div className="flex justify-center items-center w-full col-span-full">
+      <h2 className="text-xl font-bold text-cyan-500 whitespace-nowrap">
+        {noResultsText}
+      </h2>
+    </div>
   );
 };
 
-const Home = () => {
+const Home = ({ language }) => {
   const [loading, setLoading] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
-  const [searchedResults, setSearchedResults] = useState(null);
+  const [searchedResults, setSearchedResults] = useState([]);
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [language, setLanguage] = useState('en'); // Default language is English
   const isFetching = useRef(false);
 
   const handleSearchChange = (e) => {
@@ -60,18 +61,13 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const userLanguage = navigator.language.includes('he') ? 'he' : 'en';
-    setLanguage(userLanguage);
-  }, []);
-
-  useEffect(() => {
     if (!isFetching.current) {
       isFetching.current = true;
 
       const fetchPosts = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`/api/v1/post`, {
+          const response = await axios.get('/api/v1/post', {
             headers: { 'Content-Type': 'application/json' },
           });
           setAllPosts(response.data.data.reverse());
@@ -88,58 +84,67 @@ const Home = () => {
   }, []);
 
   return (
-    <section className="container">
-      {/* Language Switcher (flags on top right) */}
-      <div className="language-switcher">
-        <button onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}>
-          {language === 'en' ? '🇮🇱' : '🇬🇧'}
-        </button>
+    <section className="home-container container">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1
+            className={`title text-3xl font-bold text-gray-800 ${language === 'he' ? 'text-right' : ''}`}
+          >
+            {texts[language].title}
+          </h1>
+          <p
+            className={`description text-lg text-gray-600 px-1 max-w-3xl pb-8 pt-3 ${language === 'he' ? 'text-right' : ''}`}
+          >
+            {texts[language].description}
+          </p>
+        </div>
       </div>
 
-      <div>
-        <h1 className={`title ${language === 'he' ? 'text-right' : ''}`}>
-          {texts[language].title}
-        </h1>
-        <p className={`description ${language === 'he' ? 'text-right' : ''}`}>
-          {texts[language].description}
-        </p>
-      </div>
-
-      <div className="search-field">
+      <div className="px-1 mb-4 w-full sm:w-auto">
         <FormField
           labelName={texts[language].searchPlaceholder}
-          type="text"
           name="text"
           placeholder={texts[language].searchPlaceholder}
           value={searchText}
           handleChange={handleSearchChange}
+          language={language}  
+          autocomplete="off"
         />
       </div>
 
-      <div className="card-section">
+      <div className="card-section grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {loading ? (
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center h-full col-span-full">
             <Loader />
           </div>
         ) : (
           <>
             {searchText && (
-              <h2 className="font-medium text-gray-400 text-xl mb-3">
-                {texts[language].showingResults} <span className="text-white">{searchText}</span>
+              <h2 className="text-xl font-bold text-gray-500 col-span-full mb-4 text-left max-w-full break-words">
+                {texts[language].showingResults}{' '}
+                <span className="highlight">{searchText}</span>
               </h2>
             )}
-            <div className="card-section">
-              {searchText ? (
-                <RenderCards data={searchedResults} title={texts[language].noResults} />
-              ) : (
-                <RenderCards data={allPosts} title={texts[language].noPosts} />
-              )}
-            </div>
+
+            {searchText ? (
+              <RenderCards
+                data={searchedResults}
+                noResultsText={texts[language].noResults}
+                language={language}
+              />
+            ) : (
+              <RenderCards
+                data={allPosts}
+                noResultsText={texts[language].noPosts}
+                language={language}
+              />
+            )}
           </>
         )}
       </div>
     </section>
   );
 };
+
 
 export default Home;

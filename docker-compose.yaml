@@ -35,13 +35,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-      - "443:443" # SSL port - for local development remove this line
+      # - "443:443" # SSL port - for local development remove this line
     depends_on:
       - frontend
     volumes:
       - vite-build:/usr/share/nginx/html
-      - /etc/ssl/certs:/etc/ssl/certs # SSL certifcation path - for local development remove this line
-      - /etc/ssl/private:/etc/ssl/private # SSL certifcation path - for local development remove this line
+      # - /etc/ssl/certs:/etc/ssl/certs # SSL certifcation path - for local development remove this line
+      # - /etc/ssl/private:/etc/ssl/private # SSL certifcation path - for local development remove this line
     networks:
       - app-network
     container_name: nginx

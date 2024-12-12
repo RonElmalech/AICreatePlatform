@@ -1,38 +1,48 @@
 import React from 'react';
-import download from '../assets/download.png';
+import { MdDownloadForOffline } from 'react-icons/md';
 import { downloadImage } from '../utils';
-import './Card.css'; // Import the CSS file
-
-const isHebrew = (text) => {
-  return /[\u0590-\u05FF]/.test(text);
-};
 
 const Card = ({ _id, name, prompt, photo }) => {
-  const isPromptHebrew = isHebrew(prompt);
-  const isNameHebrew = isHebrew(name);
-
-  const promptTextDirection = isPromptHebrew ? 'rtl' : 'ltr';
-  const promptAlignmentClass = isPromptHebrew ? 'text-right' : 'text-left';
-
-  const layoutDirectionClass = isNameHebrew ? 'flex-row-reverse' : 'flex-row';
-  const nameAlignmentClass = isNameHebrew ? 'mr-2' : 'ml-2';
-  const buttonAlignmentClass = isNameHebrew ? 'ml-2' : 'mr-2';
-  const textAlignmentClass = isNameHebrew ? 'text-right' : 'text-left';
+  const isNameHebrew = /[\u0590-\u05FF]/.test(name);  // Detect Hebrew in name
+  const isPromptHebrew = /[\u0590-\u05FF]/.test(prompt);  // Detect Hebrew in prompt
 
   return (
-    <div className="card-container">
-      <img className="card-image" src={photo} alt={prompt} />
-      <div className="card-overlay">
-        <p className={`card-prompt ${promptAlignmentClass}`} style={{ direction: promptTextDirection }}>
+    <div className="relative group">
+      {/* Image */}
+      <img
+        src={photo}
+        alt={prompt}
+        className="w-full h-full object-cover rounded-lg"
+      />
+
+      {/* Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Prompt Text */}
+        <p
+          className={`text-sm mb-2 ${isPromptHebrew ? 'text-right' : 'text-left'}`}
+          style={{ direction: isPromptHebrew ? 'rtl' : 'ltr' }}
+        >
           {prompt}
         </p>
-        <div className={`card-footer ${layoutDirectionClass}`}>
-          <div className={`card-name-container ${layoutDirectionClass}`}>
-            <div className={`card-avatar ${nameAlignmentClass}`}>{name[0]}</div>
-            <p className={`card-name ${textAlignmentClass}`}>{name}</p>
+
+        {/* User Info and Download */}
+        <div className={`flex items-center ${isNameHebrew ? 'flex-row-reverse' : 'flex-row'}`}>
+          {/* User Info */}
+          <div className={`flex items-center ${isNameHebrew ? 'flex-row-reverse' : 'flex-row'}`}>
+            {/* User Image */}
+            <div className={`w-6 h-6 rounded-full bg-gray-500 flex items-center justify-center text-white text-lg`}>
+              {name[0]} {/* First letter */}
+            </div>
+            {/* User Name */}
+            <span className="text-sm mx-2">{name}</span>
           </div>
-          <button type="button" onClick={() => downloadImage(_id, photo)} className={`download-button ${buttonAlignmentClass}`}>
-            <img src={download} alt="download" className="download-icon" />
+
+          {/* Download Button */}
+          <button
+            onClick={() => downloadImage(_id, photo)}
+            className={`text-lg hover:text-cyan-500 ${isNameHebrew ? 'ml-2' : 'mr-2'} order-1`}  // Ensure it comes first when Hebrew
+          >
+            <MdDownloadForOffline size={32} />
           </button>
         </div>
       </div>
