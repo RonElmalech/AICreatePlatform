@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+
 const FormField = ({
   labelName,
   name,
@@ -7,6 +8,9 @@ const FormField = ({
   autocomplete,
   maxRows = 5,
   language, // Add the language prop to apply RTL/LTR styles
+  isSurpriseMe, // New prop for "Surprise Me" button
+  handleSurpriseMe, // Function for "Surprise Me"
+  maxLength, // Add max length prop to limit character count
 }) => {
   const textareaRef = useRef(null);
 
@@ -31,9 +35,10 @@ const FormField = ({
         id={name}
         rows="1"
         value={value}
-        onChange={handleChange}
+        onChange={handleChange} // Use handleChange as normal
         required
         autoComplete={autocomplete}
+        maxLength={maxLength} // Add maxLength to restrict input
         className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#4649ff] focus:border-[#4649ff] outline-none w-full p-3 resize-none overflow-hidden ${textAlign}`}
       />
       <label
@@ -44,6 +49,17 @@ const FormField = ({
       >
         {labelName}
       </label>
+
+      {/* Conditionally render "Surprise Me" button */}
+      {isSurpriseMe && (
+        <button
+          type="button"
+          onClick={handleSurpriseMe}
+          className="mt-2 text-white bg-yellow-500 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+        >
+          {language === 'he' ? 'הפתע אותי' : 'Surprise Me'}
+        </button>
+      )}
     </div>
   );
 };

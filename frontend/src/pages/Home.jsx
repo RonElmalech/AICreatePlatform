@@ -86,18 +86,21 @@ const Home = ({ language }) => {
   return (
     <section className="home-container container">
       <div className="flex justify-between items-center">
-        <div>
-          <h1
-            className={`title text-3xl font-bold text-gray-800 ${language === 'he' ? 'text-right' : ''}`}
-          >
-            {texts[language].title}
-          </h1>
-          <p
-            className={`description text-lg text-gray-600 px-1 max-w-3xl pb-8 pt-3 ${language === 'he' ? 'text-right' : ''}`}
-          >
-            {texts[language].description}
-          </p>
-        </div>
+      <div className="w-full" dir={language === 'he' ? 'rtl' : 'ltr'}>
+  <h1
+    className={`title text-3xl font-bold text-gray-800 ${language === 'he' ? 'text-right' : ''}`}
+  >
+    {texts[language].title}
+  </h1>
+
+  <p
+    className={`description text-lg text-gray-600 px-1 max-w-3xl pb-8 pt-3 ${language === 'he' ? 'text-right' : ''}`}
+    style={language === 'he' ? { textAlign: 'right' } : {}}
+  >
+    {texts[language].description}
+  </p>
+</div>
+
       </div>
 
       <div className="px-1 mb-4 w-full sm:w-auto">
@@ -109,6 +112,7 @@ const Home = ({ language }) => {
           handleChange={handleSearchChange}
           language={language}  
           autocomplete="off"
+          maxLength={50}
         />
       </div>
 
@@ -120,10 +124,14 @@ const Home = ({ language }) => {
         ) : (
           <>
             {searchText && (
-              <h2 className="text-xl font-bold text-gray-500 col-span-full mb-4 text-left max-w-full break-words">
-                {texts[language].showingResults}{' '}
-                <span className="highlight">{searchText}</span>
-              </h2>
+              <h2
+              className={`text-xl font-bold text-gray-500 col-span-full mb-4 ${language === 'he' ? 'text-right' : ''} break-words whitespace-normal`}
+              dir={language === 'he' ? 'rtl' : 'ltr'}
+            >
+              {texts[language].showingResults}{' '}
+              <span className="highlight">{searchText}</span>
+            </h2>
+            
             )}
 
             {searchText ? (
@@ -145,6 +153,5 @@ const Home = ({ language }) => {
     </section>
   );
 };
-
 
 export default Home;

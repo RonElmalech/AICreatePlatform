@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MdDownloadForOffline } from 'react-icons/md';
 import { downloadImage } from '../utils';
 
-const Card = ({ _id, name, prompt, photo }) => {
+const Card = ({ _id, name, prompt, photo, language }) => {
+  const [downloading, setDownloading] = useState(false);
   const isNameHebrew = /[\u0590-\u05FF]/.test(name);  // Detect Hebrew in name
   const isPromptHebrew = /[\u0590-\u05FF]/.test(prompt);  // Detect Hebrew in prompt
+
+  const handleDownload = async () => {
+    if (!photo) {
+      alert(language === 'he' ? 'אנא צור תמונה לפני ההורדה' : 'Please generate an image before downloading');
+      return;
+    }
+
+    setDownloading(true);
+    try {
+      const timestamp = Date.now(); // Generate a unique timestamp
+      const filename = `MindCraftAI-${name || 'user'}-${timestamp}.jpg`; // Name the image with timestamp
+      await downloadImage(photo, name, filename); // Pass the photo URL, name, and filename to downloadImage
+    } catch (error) {
+      alert(`Error downloading: ${error.message}`);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="relative group">
@@ -39,10 +58,15 @@ const Card = ({ _id, name, prompt, photo }) => {
 
           {/* Download Button */}
           <button
-            onClick={() => downloadImage(_id, photo)}
+            onClick={handleDownload}
             className={`text-lg hover:text-cyan-500 ${isNameHebrew ? 'ml-2' : 'mr-2'} order-1`}  // Ensure it comes first when Hebrew
+            disabled={downloading}
           >
-            <MdDownloadForOffline size={32} />
+            {downloading ? (
+              <span>{language === 'he' ? '...מוריד' : 'Downloading...'}</span>
+            ) : (
+              <MdDownloadForOffline size={32} />
+            )}
           </button>
         </div>
       </div>
