@@ -6,20 +6,28 @@ const texts = {
   en: {
     title: "Welcome to Mind Craft AI: Unleash Your Creativity",
     description:
-      "Mind Craft AI is a community where creativity meets innovation. Explore a collection of stunning AI-generated artworks, connect, and share your imagination.",
+      "Explore Mind Craft AI, your hub for creativity and innovation. Generate stunning AI art, browse the community feed, and share your imagination with others.",
     searchPlaceholder: "Search posts by name or prompt",
     noResults: "NO SEARCH RESULTS FOUND",
     noPosts: "NO POSTS AVAILABLE",
     showingResults: "Displaying results for",
+    createImage: "Create AI-Generated Images",
+    communityFeed: "Explore the Community Feed",
+    createImageDescription: "Generate stunning AI-powered artworks tailored to your imagination",
+    communityFeedDescription: "Discover and engage with creations from our vibrant community",
   },
   he: {
     title: "ברוכים הבאים ל-Mind Craft AI: שחררו את היצירתיות שלכם",
     description:
-      "Mind Craft AI היא קהילה בה יצירתיות וחדשנות נפגשות. גלו אוסף מרהיב של יצירות אמנות שנוצרו על ידי בינה מלאכותית, התחברו ושתפו את הדמיון שלכם.",
+      "גלו את Mind Craft AI, המרכז שלכם ליצירתיות וחדשנות. צרו אמנות מדהימה בבינה מלאכותית, עיינו בפיד הקהילה ושתפו את הדמיון שלכם עם אחרים.",
     searchPlaceholder: "חפש פוסטים לפי שם או תיאור",
     noResults: "לא נמצאו תוצאות חיפוש",
     noPosts: "אין פוסטים זמינים",
     showingResults: "מציג תוצאות עבור",
+    createImage: "צור תמונות מבוססות בינה מלאכותית",
+    communityFeed: "חקור את פיד הקהילה",
+    createImageDescription: "צרו יצירות אמנות מדהימות המבוססות על הדמיון שלכם",
+    communityFeedDescription: "גלו ותתחברו עם יצירות מהקהילה המגוונת שלנו",
   },
 };
 
@@ -84,23 +92,28 @@ const Home = ({ language }) => {
   }, []);
 
   return (
-    <section className="home-container container">
-      <div className="flex justify-between items-center">
-      <div className="w-full" dir={language === 'he' ? 'rtl' : 'ltr'}>
-  <h1
-    className={`title text-3xl font-bold text-gray-800 ${language === 'he' ? 'text-right' : ''}`}
-  >
-    {texts[language].title}
-  </h1>
+    <section className="home-container container mx-auto text-white min-h-screen px-4 py-8 w-full">
+      <div className="flex flex-col items-center text-center" dir={language === 'he' ? 'rtl' : 'ltr'}>
+        <h1 className="text-4xl font-bold mb-4">{texts[language].title}</h1>
+        <p className="text-lg max-w-2xl mb-8 text-gray-400">{texts[language].description}</p>
+      </div>
+      <div className={`flex justify-center gap-6 mb-8 flex-wrap ${language === 'he' ? 'text-right' : ''}`}
+>
+        <div
+          className="card bg-cyan-700 p-6 rounded-lg shadow-lg cursor-pointer hover:shadow-cyan-500/50 w-80"
+          onClick={() => window.location.href = '/generate'}
+        >
+          <h2 className="text-2xl font-bold mb-2">{texts[language].createImage}</h2>
+          <p className="text-sm">{texts[language].createImageDescription}</p>
+        </div>
 
-  <p
-    className={`description text-lg text-gray-600 px-1 max-w-3xl pb-8 pt-3 ${language === 'he' ? 'text-right' : ''}`}
-    style={language === 'he' ? { textAlign: 'right' } : {}}
-  >
-    {texts[language].description}
-  </p>
-</div>
-
+        <div
+          className="card bg-cyan-700 p-6 rounded-lg shadow-lg cursor-pointer hover:shadow-cyan-500/50 w-80"
+          onClick={() => window.location.href = '/community'}
+        >
+          <h2 className="text-2xl font-bold mb-2">{texts[language].communityFeed}</h2>
+          <p className="text-sm">{texts[language].communityFeedDescription}</p>
+        </div>
       </div>
 
       <div className="px-1 mb-4 w-full sm:w-auto">
@@ -110,13 +123,13 @@ const Home = ({ language }) => {
           placeholder={texts[language].searchPlaceholder}
           value={searchText}
           handleChange={handleSearchChange}
-          language={language}  
+          language={language}
           autocomplete="off"
           maxLength={50}
         />
       </div>
 
-      <div className="card-section grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="card-section grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4">
         {loading ? (
           <div className="flex justify-center items-center h-full col-span-full">
             <Loader />
@@ -125,13 +138,12 @@ const Home = ({ language }) => {
           <>
             {searchText && (
               <h2
-              className={`text-xl font-bold text-gray-500 col-span-full mb-4 ${language === 'he' ? 'text-right' : ''} break-words whitespace-normal`}
-              dir={language === 'he' ? 'rtl' : 'ltr'}
-            >
-              {texts[language].showingResults}{' '}
-              <span className="highlight">{searchText}</span>
-            </h2>
-            
+                className={`text-xl font-bold text-gray-300 col-span-full mb-4 ${language === 'he' ? 'text-right' : ''} break-words whitespace-normal`}
+                dir={language === 'he' ? 'rtl' : 'ltr'}
+              >
+                {texts[language].showingResults}{' '}
+                <span className="highlight text-cyan-400">{searchText}</span>
+              </h2>
             )}
 
             {searchText ? (

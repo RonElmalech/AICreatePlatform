@@ -35,7 +35,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-      - "443:443" # SSL port - for local development remove this line
+    #  - "443:443" # SSL port - for local development remove this line
     depends_on:
       - frontend
     volumes:

@@ -125,7 +125,7 @@ const CreatePost = ({ language }) => {
     <section className="max-w-7xl mx-auto px-5">
       <div className="text-center mt-10">
         <h1 className="text-4xl font-bold">{texts[language].title}</h1>
-        <p className="text-gray-600 mt-4">{texts[language].description}</p>
+        <p className="text-gray-400 mt-4">{texts[language].description}</p>
       </div>
 
       <div className={`max-w-3xl mx-auto ${language === 'he' ? 'flex-row-reverse' : 'flex-row'} gap-5 items-start`}>
