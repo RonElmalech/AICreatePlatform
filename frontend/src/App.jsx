@@ -33,13 +33,13 @@ const App = () => {
 <BrowserRouter>
   <div className={`flex min-h-screen ${isHebrew ? 'flex-row-reverse' : 'flex-row'} bg-gray-800 text-gray-100`}>
     {/* Sidebar */}
-    <aside className={`bg-gray-600 text-gray-100 fixed inset-y-0 ${isHebrew ? 'right-0' : 'left-0'} transition-all duration-300 ${isSidebarExpanded ? 'w-60' : 'w-16'} md:w-60`}>
+    <aside className={`bg-gray-600 text-gray-100 fixed inset-y-0 ${isHebrew ? 'right-0' : 'left-0'} transition-all duration-300 ${isSidebarExpanded ? 'w-60' : 'w-10'} md:w-60`}>
       <div className={`flex items-center justify-between px-4 py-6 ${isHebrew ? 'ml-auto' : ''}`}>
         {isSidebarExpanded && (
           <img src={logo} alt="MindCraft Logo" className={`h-10 w-auto ${isHebrew ? 'ml-auto' : ''}`} />
         )}
         <button
-          className={`p-2 focus:outline-none hover:bg-gray-700 rounded ${isSidebarExpanded ? 'bg-gray-600' : 'bg-gray-500'} transition-all md:hidden absolute ${isHebrew ? 'left-4' : 'right-4'}`}
+          className={`p-2 focus:outline-none hover:bg-gray-700 rounded ${isSidebarExpanded ? 'bg-gray-600' : 'bg-gray-500'} transition-all md:hidden absolute ${isHebrew ? 'left-0' : 'right-0'}`}
           onClick={toggleSidebar}
         >
           {isSidebarExpanded ? (isHebrew ? <GoSidebarCollapse size={24} /> : <GoSidebarExpand size={24} />) : (isHebrew ? <GoSidebarExpand size={24} /> : <GoSidebarCollapse size={24} />)}
