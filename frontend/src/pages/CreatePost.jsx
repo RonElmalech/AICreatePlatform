@@ -191,7 +191,7 @@ const CreatePost = ({ language }) => {
           </button>
 
         <div className="mt-3 w-full flex items-center justify-center">
-          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-9/12 p-3 flex items-center"> 
+          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-3 flex items-center"> 
             <div className="flex w-full h-full justify-center items-center">
               {form.photo ? (
                 <img
