@@ -1,24 +1,24 @@
 import { TranslationServiceClient } from '@google-cloud/translate';
-import { decodeBase64Credentials } from './gcloudauth.js'; // Import base64 decoding utility
+import { decodeBase64Credentials } from './gcloudauth.js'; 
 
-// Ensure GCLOUD_CREDENTIALS_BASE64 is defined and decode it
 const base64Credentials = process.env.GCLOUD_CREDENTIALS_BASE64;
 
 if (!base64Credentials) {
-    throw new Error('GCLOUD_CREDENTIALS_BASE64 is not defined in environment variables.');
+    console.error('GCLOUD_CREDENTIALS_BASE64 is not defined in environment variables.');
+    process.exit(1);
 }
 
 const credentials = decodeBase64Credentials(base64Credentials);
 
-// Create Google Translate client using the decoded credentials
 const translateClient = new TranslationServiceClient({
-    credentials, // Use the decoded credentials
-    projectId: process.env.GCLOUD_PROJECT_ID, // Your Google Cloud project ID
+    credentials,
+    projectId: process.env.GCLOUD_PROJECT_ID,
 });
 
 const location = 'global';
 const parent = `projects/${process.env.GCLOUD_PROJECT_ID}/locations/${location}`;
 
+// Existing function for detecting language and translating to English if needed
 export async function detectAndTranslate(translateClient, prompt) {
     try {
         if (!prompt) {
@@ -31,14 +31,11 @@ export async function detectAndTranslate(translateClient, prompt) {
             content: prompt,
         });
 
-        const detectedLang = detection.languages[0].languageCode; // Get detected language
-        console.log("Detected language:", detectedLang);
+        const detectedLang = detection.languages[0].languageCode;
 
         // Step 2: If the detected language is not English, translate it to English
         let translatedPrompt = prompt;
         if (detectedLang !== 'en') {
-            console.log("Translating prompt to English...");
-
             const [translation] = await translateClient.translateText({
                 parent,
                 contents: [prompt],
@@ -48,12 +45,34 @@ export async function detectAndTranslate(translateClient, prompt) {
             });
 
             translatedPrompt = translation.translations[0].translatedText;
-            console.log("Translated prompt:", translatedPrompt);
         }
 
-        return { translatedPrompt, detectedLang };  // Return translated prompt and language
+        return { translatedPrompt, detectedLang };
     } catch (error) {
         console.error("Error in language detection/translation:", error.message);
+        throw error;
+    }
+}
+
+// New function to translate specifically from English to Hebrew
+export async function translateEnglishToHebrew(translateClient, text) {
+    try {
+        if (!text) {
+            throw new Error('Text is required');
+        }
+
+        // Translate text from English to Hebrew
+        const [translation] = await translateClient.translateText({
+            parent,
+            contents: [text],
+            sourceLanguageCode: 'en',
+            targetLanguageCode: 'he', // Target language: Hebrew
+            mimeType: 'text/plain',
+        });
+
+        return translation.translations[0].translatedText;
+    } catch (error) {
+        console.error("Error in English to Hebrew translation:", error.message);
         throw error;
     }
 }

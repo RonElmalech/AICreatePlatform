@@ -87,7 +87,7 @@ const App = () => {
 
     {/* Main Content */}
     <div className={`flex-1 flex flex-col ${isSidebarExpanded ? (isHebrew ? 'mr-60' : 'ml-60') : (isHebrew ? 'mr-16' : 'ml-16')} overflow-hidden`}>
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-6 mt-6">
         <Routes>
           <Route path="/" element={<Home language={language} />} />
           <Route path="/community" element={<Community language={language} />} />
@@ -97,7 +97,7 @@ const App = () => {
     </div>
 
     {/* Language Switcher */}
-    <div className={`fixed top-4 ${isHebrew ? 'left-4' : 'right-4'} z-20`}>
+    <div className={`fixed top-4 ${isHebrew ? 'left-4' : 'right-4'} z-50`}>
       <LanguageSwitcher language={language} setLanguage={setLanguage} />
     </div>
   </div>

@@ -28,7 +28,7 @@ const FormField = ({
   const labelAlign = language === 'he' ? 'right-3' : 'left-3'; // Right for Hebrew and left for English
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <textarea
         ref={textareaRef}
         name={name}
@@ -39,11 +39,11 @@ const FormField = ({
         required
         autoComplete={autocomplete}
         maxLength={maxLength} // Add maxLength to restrict input
-        className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#4649ff] focus:border-[#4649ff] outline-none w-full p-3 resize-none overflow-hidden ${textAlign}`}
+        className={`bg-gray-50 border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-[#4649ff] focus:border-[#4649ff] outline-none w-full p-3 resize-none overflow-hidden ${textAlign}`}
       />
       <label
         htmlFor={name}
-        className={`absolute ${labelAlign} text-sm font-medium text-gray-900 transition-all duration-200 ${
+        className={`absolute ${labelAlign} text-xs sm:text-sm font-medium text-gray-900 transition-all duration-200 ${
           value ? 'translate-y-[-1.25rem] scale-75' : 'top-3'
         }`}
       >
