@@ -86,7 +86,7 @@ const App = () => {
     </aside>
 
     {/* Main Content */}
-    <div className={`flex-1 flex flex-col ${isSidebarExpanded ? (isHebrew ? 'mr-60' : 'ml-60') : (isHebrew ? 'mr-16' : 'ml-16')} overflow-hidden`}>
+    <div className={`flex-1 flex flex-col ${isSidebarExpanded ? (isHebrew ? 'mr-60 text-right' : 'ml-60 text-left') : (isHebrew ? 'mr-6 text-right' : 'ml-6 text-left')} overflow-hidden`}>
       <main className="flex-1 overflow-y-auto p-6 mt-6">
         <Routes>
           <Route path="/" element={<Home language={language} />} />
@@ -102,6 +102,7 @@ const App = () => {
     </div>
   </div>
 </BrowserRouter>
+
 
 
 
