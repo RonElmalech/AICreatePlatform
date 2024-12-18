@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes, NavLink } from 'react-router-dom';
 import { Home, CreatePost, Community, ChatWithAI, EditImage } from './pages';
 import LanguageSwitcher from './components/LanguageSwitcher';
-import { FiHome, FiUsers, FiImage } from 'react-icons/fi';
+import { FiHome, FiUsers, FiImage , FiMessageCircle } from 'react-icons/fi';
 import { GoSidebarCollapse, GoSidebarExpand } from 'react-icons/go';
-import logo from './assets/MindCraft-logo.png';
+import logo from './assets/MindCraft-logo.png'; 
 
 const App = () => {
   const [language, setLanguage] = useState('en');

@@ -2,8 +2,7 @@ import express from 'express';
 import * as dotenv from 'dotenv'; 
 import axios from 'axios'; 
 import { detectAndTranslate, translateEnglishToHebrew } from '../utils/languageUtils.js'; 
-import { decodeBase64Credentials } from '../utils/gcloudauth.js'; 
-import { TranslationServiceClient } from '@google-cloud/translate';
+
 
 dotenv.config();
 
