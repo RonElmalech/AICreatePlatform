@@ -16,7 +16,7 @@ const ChatWithAI = () => {
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
-
+    setInput("");
     const userMessage = { type: "user", text: input };
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
@@ -38,7 +38,7 @@ const ChatWithAI = () => {
       toast.error("Error generating response.");
     }
     setLoading(false);
-    setInput("");
+    
   };
 
   const handleVoiceInput = () => {
@@ -77,15 +77,16 @@ const ChatWithAI = () => {
       console.error("Speech recognition error:", event);
       setIsListening(false);
       setIsRecognitionInProgress(false);
-      // Single toast for speech issues
+      // Show only one toast for speech issues
       toast.error("No speech detected. Please try again.");
     };
 
     newRecognition.onend = () => {
       setIsListening(false);
       setIsRecognitionInProgress(false);
+      // Show "No speech detected" only if there was no input detected
       if (!input.trim()) {
-        toast.error("No speech detected. Please try again."); // Single error toast for all speech issues
+        toast.error("No speech detected. Please try again.");
       }
     };
 
