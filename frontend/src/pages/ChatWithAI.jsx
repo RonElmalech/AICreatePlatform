@@ -21,31 +21,27 @@ const ChatWithAI = () => {
     setImageUrl(""); // Reset image when new message is sent
 
     try {
-      const res = await fetch("/api/v1/dalle/generate-text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: input }),
-      });
-      const data = await res.json();
-console.log(data);
+        // Fetch text response (AI generated text)
+        const res = await fetch("/api/v1/dalle/generate-text", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: input }),
+        });
+        const data = await res.json();
 
-      const aiMessage = { type: "ai", text: data};
-      setMessages((prev) => [...prev, aiMessage]);
+        const aiMessage = { type: "ai", text: data.result };  // Save AI text result
+        setMessages((prev) => [...prev, aiMessage]);
 
-      const imageRes = await fetch("/api/v1/dalle/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: input }),
-      });
-      const imageData = await imageRes.json();
-      setImageUrl(imageData.imageBase64);
+        // No image generation here since you have a separate page for that
+
     } catch (error) {
-      console.error("Error fetching AI response:", error);
-      toast.error("Error generating response.");
+        console.error("Error fetching AI response:", error);
+        toast.error("Error generating response.");
     }
     setLoading(false);
     setInput("");
-  };
+};
+
 
   const handleVoiceInput = () => {
     if (!("webkitSpeechRecognition" in window)) {
