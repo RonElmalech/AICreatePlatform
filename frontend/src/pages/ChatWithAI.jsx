@@ -69,16 +69,18 @@ const ChatWithAI = () => {
     newRecognition.onerror = (event) => {
       console.error("Speech recognition error:", event);
       setIsListening(false);
-      toast.error("There was an error with speech recognition.");
+      // Single toast for speech issues
+      toast.error("No speech detected. Please try again.");
     };
 
     newRecognition.onend = () => {
       setIsListening(false);
       if (!input.trim()) {
-        toast.info("No speech detected. Please try again.");
+        toast.error("No speech detected. Please try again."); // Single error toast for all speech issues
       }
     };
 
+    // Start speech recognition
     newRecognition.start();
     setRecognition(newRecognition); // Save the recognition instance to manage it
   };
