@@ -59,14 +59,19 @@ const ChatWithAI = () => {
     };
 
     recognition.onerror = (event) => {
+      // Check for 'aborted' error and ignore it
+      if (event.error === "aborted") {
+        return; // Ignore this error
+      }
       console.error("Speech recognition error:", event);
-      // Don't show error for empty or delayed results
     };
 
     recognition.onend = () => {
       setIsListening(false);
       if (input.trim()) {
         handleSendMessage(); // Automatically send the message after voice input
+      } else {
+        toast.info("No speech detected. Please try again.");
       }
     };
 
@@ -74,12 +79,32 @@ const ChatWithAI = () => {
   };
 
   const handleClearChat = () => {
-    toast.warn("Are you sure you want to delete all messages?", {
-      position: "bottom-center",
-      autoClose: false,
-      closeOnClick: false,
-      draggable: false,
-    });
+    toast.warn(
+      <div>
+        <p>Are you sure you want to delete all messages?</p>
+        <div className="flex justify-between mt-3">
+          <button
+            onClick={() => setMessages([])}
+            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-700"
+          >
+            No
+          </button>
+        </div>
+      </div>,
+      {
+        position: "bottom-center",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        className: "custom-toast p-4 rounded-md bg-gray-800 text-white",
+      }
+    );
   };
 
   return (
