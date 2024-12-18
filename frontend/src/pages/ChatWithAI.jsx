@@ -12,6 +12,7 @@ const ChatWithAI = () => {
   const [isListening, setIsListening] = useState(false); // Speech-to-text state
   const [recognition, setRecognition] = useState(null); // Store speech recognition instance
   const [imageUrl, setImageUrl] = useState(""); // To store the generated image URL
+  const [isRecognitionInProgress, setIsRecognitionInProgress] = useState(false); // Prevent multiple starts
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -46,10 +47,16 @@ const ChatWithAI = () => {
       return;
     }
 
+    // Prevent starting recognition if already in progress
+    if (isRecognitionInProgress) return;
+
+    setIsRecognitionInProgress(true);
+
     // If recognition is already in progress, stop it
     if (isListening) {
       recognition.stop();
       setIsListening(false);
+      setIsRecognitionInProgress(false);
       return;
     }
 
@@ -69,12 +76,14 @@ const ChatWithAI = () => {
     newRecognition.onerror = (event) => {
       console.error("Speech recognition error:", event);
       setIsListening(false);
+      setIsRecognitionInProgress(false);
       // Single toast for speech issues
       toast.error("No speech detected. Please try again.");
     };
 
     newRecognition.onend = () => {
       setIsListening(false);
+      setIsRecognitionInProgress(false);
       if (!input.trim()) {
         toast.error("No speech detected. Please try again."); // Single error toast for all speech issues
       }
