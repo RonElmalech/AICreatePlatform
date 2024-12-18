@@ -28,7 +28,7 @@ const ChatWithAI = () => {
       });
       const data = await res.json();
 
-      const aiMessage = { type: "ai", text: data.generatedText.result};
+      const aiMessage = { type: "ai", text: data.result};
       setMessages((prev) => [...prev, aiMessage]);
 
       const imageRes = await fetch("/api/v1/dalle/generate-image", {
