@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { AiOutlineSend, AiOutlineClear } from "react-icons/ai";
 import { FiImage } from "react-icons/fi";
-import { FaMicrophone } from "react-icons/fa";
+import { FaMicrophone, FaMicrophoneAltSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -12,7 +12,6 @@ const ChatWithAI = () => {
   const [isListening, setIsListening] = useState(false); // Speech-to-text state
   const [imageUrl, setImageUrl] = useState(""); // To store the generated image URL
 
-  // Function to handle sending a message
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
@@ -22,7 +21,6 @@ const ChatWithAI = () => {
     setImageUrl(""); // Reset image when new message is sent
 
     try {
-      // Call AI backend API for text generation
       const res = await fetch("/api/v1/dalle/generate-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,7 +31,6 @@ const ChatWithAI = () => {
       const aiMessage = { type: "ai", text: data.generatedText };
       setMessages((prev) => [...prev, aiMessage]);
 
-      // Call API to generate an image based on the prompt
       const imageRes = await fetch("/api/v1/dalle/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,17 +38,14 @@ const ChatWithAI = () => {
       });
       const imageData = await imageRes.json();
       setImageUrl(imageData.imageBase64);
-
     } catch (error) {
       console.error("Error fetching AI response:", error);
       toast.error("Error generating response.");
     }
-
     setLoading(false);
     setInput("");
   };
 
-  // Function to handle voice input (using Web Speech API as a placeholder)
   const handleVoiceInput = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech recognition is not supported in your browser.");
@@ -77,71 +71,32 @@ const ChatWithAI = () => {
 
     recognition.onend = () => {
       setIsListening(false);
+      handleSendMessage(); // Automatically send the message after voice input
     };
 
     recognition.start();
   };
 
-  // Function to clear the chat with confirmation
   const handleClearChat = () => {
-    toast.warn(
-      <div>
-        <p className="text-lg font-semibold">Are you sure you want to delete all messages?</p>
-        <p className="mt-2 text-sm text-gray-200">This action is irreversible.</p>
-        <div className="mt-4 flex justify-center gap-4">
-          <button
-            onClick={() => {
-              setMessages([]);
-              toast.dismiss(); // Close the Toast on confirmation
-            }}
-            className="bg-red-800 text-white py-2 px-6 rounded-md hover:bg-red-700"
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => toast.dismiss()} // Close without deleting
-            className="bg-gray-600 text-white py-2 px-6 rounded-md hover:bg-gray-500"
-          >
-            No
-          </button>
-        </div>
-      </div>,
-      {
-        position: "bottom-center", // Positioning the toast below the clear chat button
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        hideProgressBar: true,
-        pauseOnHover: true,
-        toastId: "confirm-clear-chat",
-        icon: "⚠️", // Showing a custom icon
-        className: "bg-red-600 text-white p-4 rounded-md max-w-md w-full shadow-xl",
-      }
-    );
+    toast.warn("Are you sure you want to delete all messages?", {
+      position: "bottom-center",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+    });
   };
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-[#1a1a1a] text-[#f0f0f0] min-h-screen flex flex-col">
-      <ToastContainer
-        position="bottom-center" // Ensures the toast is positioned at the bottom-center
-        style={{ marginBottom: "80px" }} // Adds extra margin to make space for the buttons
-      />
-
-      {/* Chat Header */}
+      <ToastContainer position="bottom-center" />
       <h1 className="text-center text-2xl font-bold mb-4">Chat with AI</h1>
 
-      {/* Chat Window */}
       <div className="flex-1 overflow-y-auto bg-[#2a2a2a] p-4 rounded-md">
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`my-2 ${msg.type === "user" ? "text-right" : "text-left"}`}
-          >
+          <div key={i} className={`my-2 ${msg.type === "user" ? "text-right" : "text-left"}`}>
             <p
               className={`inline-block p-2 rounded-md ${
-                msg.type === "user"
-                  ? "bg-[#3b82f6] text-[#ffffff]"
-                  : "bg-[#444444] text-[#f0f0f0]"
+                msg.type === "user" ? "bg-[#3b82f6] text-[#ffffff]" : "bg-[#444444] text-[#f0f0f0]"
               }`}
             >
               {msg.text}
@@ -151,7 +106,6 @@ const ChatWithAI = () => {
         {loading && <p className="text-center">AI is typing...</p>}
       </div>
 
-      {/* Image Display */}
       {imageUrl && (
         <div className="my-4">
           <h3 className="text-center text-xl font-semibold">Generated Image:</h3>
@@ -159,45 +113,21 @@ const ChatWithAI = () => {
         </div>
       )}
 
-      {/* Input Area */}
       <div className="mt-4 flex items-center gap-2">
-        {/* Text Input */}
         <input
           type="text"
           placeholder="Type your message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 p-2 bg-[#333333] text-[#f0f0f0] rounded-md border-none outline-none"
+          className="flex-1 p-2 bg-[#333333] text-[#f0f0f0] rounded-md"
         />
-
-        {/* Send Button */}
-        <button
-          onClick={handleSendMessage}
-          className="p-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-md"
-        >
+        <button onClick={handleSendMessage} className="p-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-md">
           <AiOutlineSend size={24} />
         </button>
-
-        {/* Image Upload */}
-        <button className="p-2 bg-[#444444] hover:bg-[#555555] rounded-md">
-          <FiImage size={24} className="text-gray-200" />
+        <button onClick={handleVoiceInput} className={`p-2 ${isListening ? "bg-[#ef4444]" : "bg-[#444444]"}`}>
+          {isListening ? <FaMicrophoneAltSlash size={24} /> : <FaMicrophone size={24} />}
         </button>
-
-        {/* Microphone for Voice Input */}
-        <button
-          onClick={handleVoiceInput}
-          className={`p-2 ${
-            isListening ? "bg-[#ef4444]" : "bg-[#444444] hover:bg-[#555555]"
-          } rounded-md`}
-        >
-          <FaMicrophone size={24} className="text-gray-200" />
-        </button>
-
-        {/* Clear Chat */}
-        <button
-          onClick={handleClearChat}
-          className="p-2 bg-[#ef4444] hover:bg-[#dc2626] text-white rounded-md"
-        >
+        <button onClick={handleClearChat} className="p-2 bg-[#ef4444] text-white rounded-md">
           <AiOutlineClear size={24} />
         </button>
       </div>

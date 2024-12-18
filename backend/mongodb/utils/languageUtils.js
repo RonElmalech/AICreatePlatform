@@ -15,11 +15,12 @@ const translateClient = new TranslationServiceClient({
     projectId: process.env.GCLOUD_PROJECT_ID,
 });
 
+
 const location = 'global';
 const parent = `projects/${process.env.GCLOUD_PROJECT_ID}/locations/${location}`;
 
 // Existing function for detecting language and translating to English if needed
-export async function detectAndTranslate(translateClient, prompt) {
+export async function detectAndTranslate(prompt) {
     try {
         if (!prompt) {
             throw new Error('Prompt is required');
@@ -55,7 +56,7 @@ export async function detectAndTranslate(translateClient, prompt) {
 }
 
 // New function to translate specifically from English to Hebrew
-export async function translateEnglishToHebrew(translateClient, text) {
+export async function translateEnglishToHebrew(text) {
     try {
         if (!text) {
             throw new Error('Text is required');

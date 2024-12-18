@@ -1,8 +1,7 @@
-import express from 'express'; 
-import * as dotenv from 'dotenv'; 
-import axios from 'axios'; 
+import express from 'express';
+import * as dotenv from 'dotenv';
+import axios from 'axios';
 import { detectAndTranslate, translateEnglishToHebrew } from '../utils/languageUtils.js'; 
-
 
 dotenv.config();
 
@@ -32,6 +31,7 @@ const generateSpeech = async (text, language) => {
     return response.data; // Return audio data
 };
 
+// Handle translation from the front-end
 router.route('/translate').post(async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -40,15 +40,16 @@ router.route('/translate').post(async (req, res) => {
         }
 
         // Translate prompt from English to Hebrew
-        const translatedPrompt = await translateEnglishToHebrew(translateClient, prompt);
+        const translatedPrompt = await translateEnglishToHebrew(prompt);
         return res.status(200).json({ translatedPrompt });
-        
+
     } catch (error) {
         console.error("Error occurred during translation:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
+// Handle text generation
 router.route('/generate-text').post(async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -58,12 +59,7 @@ router.route('/generate-text').post(async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        // Translate prompt if it's not already in Hebrew
-        const { translatedPrompt, detectedLang } = await detectAndTranslate(translateClient, prompt);
-
-        const input = { prompt: translatedPrompt, language: detectedLang || 'en' };
-
-        const response = await axios.post(`${CF_API_URL}/${modelId}`, input, {
+        const response = await axios.post(`${CF_API_URL}/${modelId}`, { prompt }, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${API_TOKEN}`,
@@ -75,13 +71,14 @@ router.route('/generate-text').post(async (req, res) => {
         }
 
         return res.status(200).json({ generatedText: response.data });
-        
+
     } catch (error) {
         console.error("Error occurred during text generation:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
+// Handle image generation
 router.route('/generate-image').post(async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -91,9 +88,9 @@ router.route('/generate-image').post(async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        const { translatedPrompt, detectedLang } = await detectAndTranslate(translateClient, prompt);
+        const { translatedPrompt } = await detectAndTranslate(prompt);
 
-        const input = { prompt: translatedPrompt, language: detectedLang || 'en' };
+        const input = { prompt: translatedPrompt };
 
         const response = await axios.post(`${CF_API_URL}/${modelId}`, input, {
             headers: {
@@ -122,7 +119,7 @@ router.route('/generate-image').post(async (req, res) => {
     }
 });
 
-// Auto Speech (Text-to-Speech using Cloudflare's Whisper model)
+// Handle speech generation
 router.route('/generate-speech').post(async (req, res) => {
     try {
         const { text, language = 'en' } = req.body;
