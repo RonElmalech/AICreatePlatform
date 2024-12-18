@@ -63,7 +63,7 @@ const ChatWithAI = () => {
 
     newRecognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      setInput(transcript);
+      setInput((prevInput) => prevInput + " " + transcript); // Merge speech with existing input
     };
 
     newRecognition.onerror = (event) => {
@@ -73,16 +73,12 @@ const ChatWithAI = () => {
     };
 
     newRecognition.onend = () => {
-      // After recognition ends, handle the results
       setIsListening(false);
-      if (input.trim()) {
-        handleSendMessage(); // Automatically send the message after voice input if there is something
-      } else {
+      if (!input.trim()) {
         toast.info("No speech detected. Please try again.");
       }
     };
 
-    // Start speech recognition
     newRecognition.start();
     setRecognition(newRecognition); // Save the recognition instance to manage it
   };
@@ -93,13 +89,16 @@ const ChatWithAI = () => {
         <p>Are you sure you want to delete all messages?</p>
         <div className="flex justify-between mt-3">
           <button
-            onClick={() => setMessages([])}
+            onClick={() => {
+              setMessages([]); // Clear messages
+              toast.dismiss(); // Close the toast after confirming
+            }}
             className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
           >
             Yes
           </button>
           <button
-            onClick={() => toast.dismiss()}
+            onClick={() => toast.dismiss()} // Close toast if "No" is clicked
             className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-700"
           >
             No
