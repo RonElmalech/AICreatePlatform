@@ -27,12 +27,10 @@ const ChatWithAI = () => {
         body: JSON.stringify({ prompt: input }),
       });
       const data = await res.json();
-console.log(data);
+      console.log(data);
 
-      const aiMessage = { type: "ai", text: data};
+      const aiMessage = { type: "ai", text: data };
       setMessages((prev) => [...prev, aiMessage]);
-
-
     } catch (error) {
       console.error("Error fetching AI response:", error);
       toast.error("Error generating response.");
@@ -49,7 +47,7 @@ console.log(data);
 
     const recognition = new window.webkitSpeechRecognition();
     recognition.continuous = false;
-    recognition.lang = "en-US";
+    recognition.lang = "en-US"; // Set to "en-US", but will auto-detect via backend
 
     recognition.onstart = () => {
       setIsListening(true);
@@ -62,11 +60,14 @@ console.log(data);
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event);
+      // Don't show error for empty or delayed results
     };
 
     recognition.onend = () => {
       setIsListening(false);
-      handleSendMessage(); // Automatically send the message after voice input
+      if (input.trim()) {
+        handleSendMessage(); // Automatically send the message after voice input
+      }
     };
 
     recognition.start();

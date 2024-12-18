@@ -78,47 +78,6 @@ router.route('/generate-text').post(async (req, res) => {
     }
 });
 
-// Handle image generation
-router.route('/generate-image').post(async (req, res) => {
-    try {
-        const { prompt } = req.body;
-        const modelId = '@cf/bytedance/stable-diffusion-xl-lightning'; // Default model set here
-
-        if (!prompt) {
-            return res.status(400).json({ error: 'Prompt is required' });
-        }
-
-        const { translatedPrompt } = await detectAndTranslate(prompt);
-
-        const input = { prompt: translatedPrompt };
-
-        const response = await axios.post(`${CF_API_URL}/${modelId}`, input, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${API_TOKEN}`,
-            },
-            responseType: 'arraybuffer',
-        });
-
-        if (response.status !== 200) {
-            throw new Error('Error generating image from Cloudflare API');
-        }
-
-        const contentType = response.headers['content-type'];
-
-        if (contentType && contentType.startsWith('image/')) {
-            const base64Image = `data:${contentType};base64,${Buffer.from(response.data, 'binary').toString('base64')}`;
-            return res.status(200).json({ imageBase64: base64Image });
-        } else {
-            throw new Error('Unexpected response format from Cloudflare API');
-        }
-
-    } catch (error) {
-        console.error("Error occurred during image generation:", error.message);
-        res.status(500).json({ error: error.message });
-    }
-});
-
 // Handle speech generation
 router.route('/generate-speech').post(async (req, res) => {
     try {
