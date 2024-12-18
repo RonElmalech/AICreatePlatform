@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes, NavLink } from 'react-router-dom';
-import { Home, CreatePost, Community } from './pages';
+import { Home, CreatePost, Community, ChatWithAI, EditImage } from './pages';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { FiHome, FiUsers, FiImage } from 'react-icons/fi';
 import { GoSidebarCollapse, GoSidebarExpand } from 'react-icons/go';
@@ -82,8 +82,38 @@ const App = () => {
             )}
           </div>
         </NavLink>
-      </nav>
-    </aside>
+
+      {/* Chat With AI Link */}
+            <NavLink
+              to="/chat"
+              className={({ isActive }) =>
+                `flex items-center py-2 px-2 rounded transition ${
+                  isSidebarExpanded ? 'justify-start' : 'justify-center'
+                } ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`
+              }
+            >
+              <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
+                <FiMessageCircle size={20} />
+              </span>
+              {isSidebarExpanded && <span>{language === 'he' ? 'שיחה עם AI' : 'Chat With AI'}</span>}
+            </NavLink>
+
+            {/* Edit Image Link */}
+            <NavLink
+              to="/edit"
+              className={({ isActive }) =>
+                `flex items-center py-2 px-2 rounded transition ${
+                  isSidebarExpanded ? 'justify-start' : 'justify-center'
+                } ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`
+              }
+            >
+              <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
+                <FiEdit3 size={20} />
+              </span>
+              {isSidebarExpanded && <span>{language === 'he' ? 'עריכת תמונה' : 'Edit Image'}</span>}
+            </NavLink>
+          </nav>
+        </aside>
 
     {/* Main Content */}
     <div className={`flex-1 flex flex-col ${isSidebarExpanded ? (isHebrew ? 'mr-60 text-right' : 'ml-60 text-left') : (isHebrew ? 'mr-6 text-right' : 'ml-6 text-left')} overflow-hidden`}>
@@ -92,6 +122,8 @@ const App = () => {
           <Route path="/" element={<Home language={language} />} />
           <Route path="/community" element={<Community language={language} />} />
           <Route path="/generate" element={<CreatePost language={language} />} />
+          <Route path="/chat" element={<ChatWithAI language={language} />} />
+          <Route path="/edit" element={<EditImage language={language} />} />
         </Routes>
       </main>
     </div>
