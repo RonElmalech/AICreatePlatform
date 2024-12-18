@@ -27,6 +27,7 @@ const ChatWithAI = () => {
         body: JSON.stringify({ prompt: input }),
       });
       const data = await res.json();
+console.log(data);
 
       const aiMessage = { type: "ai", text: data.generatedText };
       setMessages((prev) => [...prev, aiMessage]);
