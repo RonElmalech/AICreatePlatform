@@ -13,10 +13,11 @@ const ChatWithAI = () => {
   const [recognition, setRecognition] = useState(null); // Store speech recognition instance
   const [imageUrl, setImageUrl] = useState(""); // To store the generated image URL
   const [isRecognitionInProgress, setIsRecognitionInProgress] = useState(false); // Prevent multiple starts
+  const [hasStartedRecognition, setHasStartedRecognition] = useState(false); // Prevent the first-time toast
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
-    setInput("");
+
     const userMessage = { type: "user", text: input };
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
@@ -28,8 +29,8 @@ const ChatWithAI = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: input }),
       });
+      setInput("");
       const data = await res.json();
-      console.log(data);
 
       const aiMessage = { type: "ai", text: data };
       setMessages((prev) => [...prev, aiMessage]);
@@ -66,6 +67,7 @@ const ChatWithAI = () => {
 
     newRecognition.onstart = () => {
       setIsListening(true);
+      setHasStartedRecognition(true); // Mark that the first recognition has started
     };
 
     newRecognition.onresult = (event) => {
@@ -78,6 +80,9 @@ const ChatWithAI = () => {
       setIsListening(false);
       setIsRecognitionInProgress(false);
       // Show only one toast for speech issues
+      if (!hasStartedRecognition) {
+        setHasStartedRecognition(true); // Avoid showing toast for the first error
+      }
       toast.error("No speech detected. Please try again.");
     };
 
