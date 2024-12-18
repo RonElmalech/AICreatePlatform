@@ -70,7 +70,7 @@ router.route('/generate-text').post(async (req, res) => {
             throw new Error('Error generating text from Cloudflare API');
         }
 
-        return res.status(200).json(response.data);
+        return res.status(200).json(response.data.result.response);
 
     } catch (error) {
         console.error("Error occurred during text generation:", error.message);
