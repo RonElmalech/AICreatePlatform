@@ -11,6 +11,7 @@ const ChatWithAI = () => {
   const [loading, setLoading] = useState(false); // Loading state for AI response
   const [isListening, setIsListening] = useState(false); // Speech-to-text state
   const [imageUrl, setImageUrl] = useState(""); // To store the generated image URL
+  const [recognition, setRecognition] = useState(null); // Store speech recognition instance for control
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -29,8 +30,9 @@ const ChatWithAI = () => {
       const data = await res.json();
       console.log(data);
 
-      const aiMessage = { type: "ai", text: data };
+      const aiMessage = { type: "ai", text: data.result };
       setMessages((prev) => [...prev, aiMessage]);
+
     } catch (error) {
       console.error("Error fetching AI response:", error);
       toast.error("Error generating response.");
@@ -45,66 +47,70 @@ const ChatWithAI = () => {
       return;
     }
 
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.continuous = false;
-    recognition.lang = "en-US"; // Set to "en-US", but will auto-detect via backend
+    const recognitionInstance = new window.webkitSpeechRecognition();
+    recognitionInstance.continuous = false;
+    recognitionInstance.lang = "en-US";
+    setRecognition(recognitionInstance);
 
-    recognition.onstart = () => {
+    recognitionInstance.onstart = () => {
       setIsListening(true);
     };
 
-    recognition.onresult = (event) => {
+    recognitionInstance.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInput(transcript);
     };
 
-    recognition.onerror = (event) => {
-      // Check for 'aborted' error and ignore it
-      if (event.error === "aborted") {
-        return; // Ignore this error
-      }
+    recognitionInstance.onerror = (event) => {
       console.error("Speech recognition error:", event);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      if (input.trim()) {
-        handleSendMessage(); // Automatically send the message after voice input
-      } else {
-        toast.info("No speech detected. Please try again.");
+      if (event.error === "no-speech") {
+        toast.error("No speech detected, please try again.");
       }
     };
 
-    recognition.start();
+    recognitionInstance.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionInstance.start();
+  };
+
+  const handleAbortVoiceInput = () => {
+    if (recognition) {
+      recognition.abort(); // Abort the recognition
+      setIsListening(false); // Reset the listening state
+      toast.success("Speech recognition aborted.");
+    }
   };
 
   const handleClearChat = () => {
-    toast.warn(
-      <div>
-        <p>Are you sure you want to delete all messages?</p>
-        <div className="flex justify-between mt-3">
+    toast.warn("Are you sure you want to delete all messages?", {
+      position: "bottom-center",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+      onClose: () => {
+        setMessages([]); // Clear the chat after confirming
+      },
+      buttons: (
+        <div>
           <button
-            onClick={() => setMessages([])}
-            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
+            onClick={() => {
+              toast.dismiss(); // Close the toast manually
+              setMessages([]); // Clear messages
+            }}
+            style={{ marginRight: 10 }}
           >
             Yes
           </button>
           <button
-            onClick={() => toast.dismiss()}
-            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-700"
+            onClick={() => toast.dismiss()} // Close the toast if "No"
           >
             No
           </button>
         </div>
-      </div>,
-      {
-        position: "bottom-center",
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        className: "custom-toast p-4 rounded-md bg-gray-800 text-white",
-      }
-    );
+      ),
+    });
   };
 
   return (
@@ -147,6 +153,9 @@ const ChatWithAI = () => {
         </button>
         <button onClick={handleVoiceInput} className={`p-2 ${isListening ? "bg-[#ef4444]" : "bg-[#444444]"}`}>
           {isListening ? <FaMicrophoneAltSlash size={24} /> : <FaMicrophone size={24} />}
+        </button>
+        <button onClick={handleAbortVoiceInput} className="p-2 bg-[#ef4444] text-white rounded-md">
+          Abort
         </button>
         <button onClick={handleClearChat} className="p-2 bg-[#ef4444] text-white rounded-md">
           <AiOutlineClear size={24} />
