@@ -4,7 +4,6 @@ import axios from 'axios';
 import { detectAndTranslate, translateEnglishToHebrew } from '../utils/languageUtils.js'; 
 import { decodeBase64Credentials } from '../utils/gcloudauth.js'; 
 import { TranslationServiceClient } from '@google-cloud/translate';
-import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 
 dotenv.config();
 
@@ -13,33 +12,25 @@ const API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const CF_API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run`;
 
-const base64Credentials = process.env.GCLOUD_CREDENTIALS_BASE64;
-
-if (!base64Credentials) {
-    console.error('GCLOUD_CREDENTIALS_BASE64 is not defined in environment variables.');
-    process.exit(1);
-}
-
-const credentials = decodeBase64Credentials(base64Credentials);
-
-const translateClient = new TranslationServiceClient({
-    credentials,
-    projectId: process.env.GCLOUD_PROJECT_ID,
-});
-
-const location = 'global';
-const parent = `projects/${process.env.GCLOUD_PROJECT_ID}/locations/${location}`;
-
-// Helper function to generate speech
+// Helper function to generate speech using Cloudflare's Whisper model
 const generateSpeech = async (text, language) => {
-    const textToSpeechClient = new TextToSpeechClient({ credentials, projectId: process.env.GCLOUD_PROJECT_ID });
-    const request = {
-        input: { text },
-        voice: { languageCode: language, ssmlGender: 'NEUTRAL' },
-        audioConfig: { audioEncoding: 'MP3' },
-    };
-    const [response] = await textToSpeechClient.synthesizeSpeech(request);
-    return response.audioContent;
+    const modelId = '@cf/openai/whisper-large-v3-turbo'; // Cloudflare Whisper model for TTS
+
+    const input = { prompt: text, language: language || 'en' };
+
+    const response = await axios.post(`${CF_API_URL}/${modelId}`, input, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${API_TOKEN}`,
+        },
+        responseType: 'arraybuffer', // Expecting binary audio data
+    });
+
+    if (response.status !== 200) {
+        throw new Error('Error generating speech from Cloudflare Whisper model');
+    }
+
+    return response.data; // Return audio data
 };
 
 router.route('/translate').post(async (req, res) => {
@@ -132,8 +123,7 @@ router.route('/generate-image').post(async (req, res) => {
     }
 });
 
-
-// Auto Speech (Text-to-Speech API)
+// Auto Speech (Text-to-Speech using Cloudflare's Whisper model)
 router.route('/generate-speech').post(async (req, res) => {
     try {
         const { text, language = 'en' } = req.body;
