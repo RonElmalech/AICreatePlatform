@@ -14,4 +14,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
+  rollupOptions: {
+    external: ['react-redux'], // Add react-redux if you are externalizing it explicitly
+  },
 });
