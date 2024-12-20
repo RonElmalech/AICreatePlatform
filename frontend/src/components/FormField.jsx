@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux'; // Import useSelector from react-redux
 
 const FormField = ({
   labelName,
@@ -6,14 +7,12 @@ const FormField = ({
   value,
   handleChange,
   autocomplete,
-  maxRows = 5,
-  language, // Add the language prop to apply RTL/LTR styles
-  isSurpriseMe, // New prop for "Surprise Me" button
-  handleSurpriseMe, // Function for "Surprise Me"
-  maxLength, // Add max length prop to limit character count
+  maxRows = 5, 
+  maxLength, // Add maxLength to restrict input
 }) => {
   const textareaRef = useRef(null);
-
+  const [isFocused, setIsFocused] = useState(false); // Track focus state
+  const language = useSelector((state) => state.language.language); // Get the language from the store
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'; // Reset height
@@ -27,6 +26,13 @@ const FormField = ({
   const textAlign = language === 'he' ? 'text-right' : 'text-left'; // Conditional alignment based on language
   const labelAlign = language === 'he' ? 'right-3' : 'left-3'; // Right for Hebrew and left for English
 
+  const handleFocus = () => setIsFocused(true); // Set focus state to true
+  const handleBlur = () => {
+    if (value === '') {
+      setIsFocused(false); // Reset to false if textarea is empty
+    }
+  };
+
   return (
     <div className="relative w-full">
       <textarea
@@ -39,27 +45,19 @@ const FormField = ({
         required
         autoComplete={autocomplete}
         maxLength={maxLength} // Add maxLength to restrict input
-        className={`bg-gray-50 border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-[#4649ff] focus:border-[#4649ff] outline-none w-full p-3 resize-none overflow-hidden ${textAlign}`}
+        className={`bg-[#2a2a2a] border border-[#444444] text-[#f0f0f0] text-xs sm:text-sm rounded-lg focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none w-full p-2 resize-none overflow-hidden ${textAlign}`}
+        placeholder=" " // This creates the placeholder behavior
+        onFocus={handleFocus} // Trigger the label to move up on focus
+        onBlur={handleBlur} // Reset the label position when blur and empty
       />
       <label
         htmlFor={name}
-        className={`absolute ${labelAlign} text-xs sm:text-sm font-medium text-gray-900 transition-all duration-200 ${
-          value ? 'translate-y-[-1.25rem] scale-75' : 'top-3'
+        className={`absolute ${labelAlign} text-xs sm:text-sm font-medium text-[#f0f0f0] transition-all duration-200 ${
+          isFocused || value ? 'translate-y-[-1.25rem] scale-75' : 'top-2.5 sm:top-2'
         }`}
       >
         {labelName}
       </label>
-
-      {/* Conditionally render "Surprise Me" button */}
-      {isSurpriseMe && (
-        <button
-          type="button"
-          onClick={handleSurpriseMe}
-          className="mt-2 text-white bg-yellow-500 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
-        >
-          {language === 'he' ? 'הפתע אותי' : 'Surprise Me'}
-        </button>
-      )}
     </div>
   );
 };

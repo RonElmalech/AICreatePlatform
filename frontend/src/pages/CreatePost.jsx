@@ -5,9 +5,10 @@ import preview from '../assets/preview.png';
 import getRandomPrompt from '../utils/index.js';
 import axios from 'axios';
 import { downloadImage } from '../utils'; // Assuming downloadImage is imported from utils
-import FileSaver from 'file-saver'; // Ensure FileSaver is installed
+import { useSelector } from 'react-redux';
 
-const CreatePost = ({ language }) => {
+const CreatePost = () => {
+  const language = useSelector((state) => state.language.language);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
@@ -57,9 +58,10 @@ const CreatePost = ({ language }) => {
     if (language === 'he') {
       try {
         const response = await axios.post('/api/v1/dalle/translate', {
-          prompt: randomPrompt,
+          text: randomPrompt,
+          target: 'he',
         });
-        setForm({ ...form, prompt: response.data.translatedPrompt });
+        setForm({ ...form, prompt: response.data.translatedText });
       } catch (error) {
         console.error('Translation failed', error);
       }
@@ -135,14 +137,14 @@ const CreatePost = ({ language }) => {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-5">
-      <div className="text-center mt-10">
+    <section className="max-w-7xl px-2 pt-8">
+      <div className="">
         <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">{texts[language].title}</h1>
         <p className="text-gray-400 text-xs sm:text-sm md:text-md lg:text-lg mt-2">{texts[language].description}</p>
       </div>
 
-      <div className={`max-w-3xl mx-auto ${language === 'he' ? 'flex-row-reverse' : 'flex-row'} gap-4 items-start`}>
-        <form className="mt-6 max-w-3xl mx-auto w-full flex flex-col gap-5">
+      <div className={`max-w-3xl gap-4 items-start`}>
+        <form id='formContainer' className="mt-6 flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             {/* First Input */}
             <FormField
@@ -152,7 +154,6 @@ const CreatePost = ({ language }) => {
               value={form.name}
               handleChange={handleChange}
               autocomplete="name"
-              language={language}
               maxLength={30}
             />
             {/* Button placed above the second input */}
@@ -160,11 +161,11 @@ const CreatePost = ({ language }) => {
               <button
                 type="button"
                 onClick={handleSurpriseMe}
-                className={`flex items-center justify-center w-1. py-1 px-2 border rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all duration-300 ease-in-out text-xs sm:text-sm md:text-md absolute top-[-40px] 
+                className={`flex items-center justify-center py-1 px-2 border rounded-md text-white bg-[#2a2a2a] hover:bg-gray-600 transition-all duration-300 ease-in-out text-xs sm:text-sm md:text-md absolute top-[-40px] 
                 ${language === 'he' ? 'left-0' : 'right-0'}`}
               >
                 🎲
-                <span className={`ml-1 ${language === 'he' ? 'mr-1' : 'ml-1'}`}>
+                <span className={``}>
                   {language === 'he' ? 'תיאור בהפתעה' : 'Surprise Me'}
                 </span>
               </button>
@@ -175,8 +176,8 @@ const CreatePost = ({ language }) => {
                 name="prompt"
                 value={form.prompt}
                 handleChange={handleChange}
-                language={language}
                 maxLength={300}
+   
               />
             </div>
           </div>
@@ -185,13 +186,13 @@ const CreatePost = ({ language }) => {
           <button
             type="button"
             onClick={generateImage}
-            className="text-white bg-green-700 font-medium rounded-md text-sm w-full px-5 py-2.5 text-center"
+            className="mt-2 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-2 px-4 rounded-lg w-full text-center"
           >
             {generatingImg ? (language === 'he' ? '...יוצר' : 'Generating...') : texts[language].generate}
           </button>
 
         <div className="mt-3 w-full flex items-center justify-center">
-          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-9/12 p-3 flex items-center"> 
+          <div className="relative bg-[#2a2a2a] border border-[#3a3a3a] text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-9/12 p-3 flex items-center"> 
             <div className="flex w-full h-full justify-center items-center">
               {form.photo ? (
                 <img
@@ -216,11 +217,11 @@ const CreatePost = ({ language }) => {
         </div>
 
         
-        <div className="flex gap-4 w-full sm:w-auto">
+        <div className="flex gap-4 w-full sm:w-auto mb-5">
   <button
     type="button"
     onClick={handleDownload}
-    className="text-white bg-yellow-500 font-medium rounded-md text-sm w-1/2 px-5 py-2.5 text-center"
+    className="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-2 px-4 rounded-lg"
     disabled={downloading || !form.photo}
   >
     {downloading ? (language === 'he' ? 'מוריד...' : 'Downloading...') : texts[language].download}
@@ -229,7 +230,7 @@ const CreatePost = ({ language }) => {
   <button
     type="button"
     onClick={handleSubmit}
-    className="text-white bg-blue-700 font-medium rounded-md text-sm w-1/2 px-5 py-2.5 text-center"
+    className="w-full bg-purple-500 hover:bg-purple-400 text-white font-bold py-2 px-4 rounded-lg"
     disabled={loading || sharing}
   >
     {sharing ? (language === 'he' ? '...משתף' : 'Sharing...') : texts[language].share}

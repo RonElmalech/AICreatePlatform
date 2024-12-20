@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
 import israel from '../assets/israel.png';
 import usa from '../assets/usa.png';
+import {useDispatch, useSelector} from 'react-redux';
+import { setLanguage } from '../store/languageSlice';
 
-const LanguageSwitcher = ({ language, setLanguage }) => {
+const LanguageSwitcher = () => {
+  const dispatch = useDispatch();
+  const language = useSelector((state) => state.language.language);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -11,14 +15,14 @@ const LanguageSwitcher = ({ language, setLanguage }) => {
   };
 
   const handleLanguageChange = (lang) => {
-    setLanguage(lang);
+   dispatch(setLanguage(lang));
     setIsOpen(false); // Close the dropdown after selecting a language
   };
 
   return (
     <div className="relative inline-block">
       <button
-        className="flex items-center px-2 py-2 rounded-md bg-gray-800 text-white hover:bg-gray-700"
+        className="flex items-center px-2 py-2 rounded-md bg-[#2a2a2a] text-white hover:bg-gray-700"
         onClick={toggleDropdown}
       >
         <img src={language === 'he' ? israel : usa} alt="Flag" className="w-5 h-5 mr-2" />
@@ -26,7 +30,7 @@ const LanguageSwitcher = ({ language, setLanguage }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 bg-gray-800 text-white rounded-md shadow-md">
+        <div className="absolute right-0 mt-2 bg-[#2a2a2a] text-white rounded-md shadow-md">
           {language === 'en' ? (
             <>
               <button

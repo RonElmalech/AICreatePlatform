@@ -2,19 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes, NavLink } from 'react-router-dom';
 import { Home, CreatePost, Community, ChatWithAI, EditImage } from './pages';
 import LanguageSwitcher from './components/LanguageSwitcher';
-import { FiHome, FiUsers, FiImage , FiMessageCircle , FiEdit3 } from 'react-icons/fi';
+import { FiHome, FiUsers, FiImage, FiMessageCircle, FiEdit3 } from 'react-icons/fi';
 import { GoSidebarCollapse, GoSidebarExpand } from 'react-icons/go';
-import logo from './assets/MindCraft-logo.png'; 
+import logo from './assets/MindCraft-logo.png';
+import { useSelector } from 'react-redux';
 
 const App = () => {
-  const [language, setLanguage] = useState('en');
+  
   const [isSidebarExpanded, setSidebarExpanded] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  const language = useSelector((state) => state.language.language);
 
   const toggleSidebar = () => setSidebarExpanded(!isSidebarExpanded);
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
+  const closeSidebar = () => {
+    if (isSidebarExpanded && windowWidth < 768) {
+      setSidebarExpanded(false);
+    }
+  };
+    useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -29,85 +40,73 @@ const App = () => {
 
   const isHebrew = language === 'he';
 
-  return (
-<BrowserRouter>
-  <div className={`flex min-h-screen ${isHebrew ? 'flex-row-reverse' : 'flex-row'} bg-gray-800 text-gray-100`}>
-    {/* Sidebar */}
-    <aside className={`bg-gray-600 text-gray-100 fixed inset-y-0 ${isHebrew ? 'right-0' : 'left-0'} transition-all duration-300 ${isSidebarExpanded ? 'w-60' : 'w-10'} md:w-60`}>
-      <div className={`flex items-center justify-between px-4 py-6 ${isHebrew ? 'ml-auto' : ''}`}>
-        {isSidebarExpanded && (
-          <img src={logo} alt="MindCraft Logo" className={`h-10 w-auto ${isHebrew ? 'ml-auto' : ''}`} />
-        )}
-        <button
-          className={`p-2 focus:outline-none hover:bg-gray-700 rounded ${isSidebarExpanded ? 'bg-gray-600' : 'bg-gray-500'} transition-all md:hidden absolute ${isHebrew ? 'left-0' : 'right-0'}`}
-          onClick={toggleSidebar}
-        >
-          {isSidebarExpanded ? (isHebrew ? <GoSidebarCollapse size={24} /> : <GoSidebarExpand size={24} />) : (isHebrew ? <GoSidebarExpand size={24} /> : <GoSidebarCollapse size={24} />)}
-        </button>
-      </div>
-      <nav className="space-y-2 flex-1">
-        <NavLink to="/" className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`}>
-          <div className={`flex ${isHebrew ? 'flex-row-reverse ml-auto' : 'flex-row'} items-center`}>
-            <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
-              <FiHome size={20} />
-            </span>
-            {isSidebarExpanded && (
-              <span className={`${isHebrew ? 'ml-3' : 'mr-3'}`}>
-                {language === 'he' ? 'דף הבית' : 'Home'}
-              </span>
-            )}
-          </div>
-        </NavLink>
-        <NavLink to="/community" className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`}>
-          <div className={`flex ${isHebrew ? 'flex-row-reverse ml-auto' : 'flex-row'} items-center`}>
-            <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
-              <FiUsers size={20} />
-            </span>
-            {isSidebarExpanded && (
-              <span className={`${isHebrew ? 'ml-3' : 'mr-3'}`}>
-                {language === 'he' ? 'קהילה' : 'Community'}
-              </span>
-            )}
-          </div>
-        </NavLink>
-        <NavLink to="/generate" className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`}>
-          <div className={`flex ${isHebrew ? 'flex-row-reverse ml-auto' : 'flex-row'} items-center`}>
-            <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
-              <FiImage size={20} />
-            </span>
-            {isSidebarExpanded && (
-              <span className={`${isHebrew ? 'ml-3' : 'mr-3'}`}>
-                {language === 'he' ? 'יצירת תמונה' : 'Generate Image'}
-              </span>
-            )}
-          </div>
-        </NavLink>
+  
+  useEffect(() => {
+    if (language === 'he') {
+      document.documentElement.setAttribute('dir', 'rtl');
+    } else {
+      document.documentElement.removeAttribute('dir');
+    }
+  }, [language]);
 
-      {/* Chat With AI Link */}
-            <NavLink
-              to="/chat"
-              className={({ isActive }) =>
-                `flex items-center py-2 px-2 rounded transition ${
-                  isSidebarExpanded ? 'justify-start' : 'justify-center'
-                } ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`
-              }
+  return (
+    <BrowserRouter>
+      <div className={`flex min-h-screen  bg-[#121212] text-gray-100 w-full overflow-x-hidden`}>
+        {/* Sidebar */}
+        <aside className={`bg-[#2a2a2a] text-gray-100 fixed inset-y-0 transition-all duration-300 ${isSidebarExpanded ? 'w-60' : 'w-10'} md:w-60`}>
+          <div className={`flex items-center justify-between px-4 py-6`}>
+            {isSidebarExpanded && (
+              <img src={logo} alt="MindCraft Logo" className={`h-10 w-auto`} />
+            )}
+            <button
+              className={`p-2 focus:outline-none hover:bg-gray-700 rounded ${isSidebarExpanded ? 'bg-gray-600' : 'bg-gray-500'} transition-all md:hidden absolute ${
+                isHebrew ? 'left-0' : 'right-0'
+              }`}
+              onClick={toggleSidebar}
             >
-              <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
+              {isSidebarExpanded ? (isHebrew ? <GoSidebarCollapse size={24} /> : <GoSidebarExpand size={24} />) : isHebrew ? <GoSidebarExpand size={24} /> : <GoSidebarCollapse size={24} />}
+            </button>
+          </div>
+          <nav className="space-y-2 flex-1">
+            {/* Navigation Links */}
+            <NavLink to="/" onClick={closeSidebar} className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'}`}>
+                <span className={`px-2 `}>
+                  <FiHome size={20} />
+                </span>
+                {isSidebarExpanded && (
+                  <span className={`${isHebrew ? 'ml-3' : 'mr-3'}`}>
+                    {language === 'he' ? 'דף הבית' : 'Home'}
+                  </span>
+                )}
+            </NavLink>
+            <NavLink to="/community" onClick={closeSidebar} className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'}`}>
+                <span className={`px-2 `}>
+                  <FiUsers size={20} />
+                </span>
+                {isSidebarExpanded && (
+                  <span className={`${isHebrew ? 'ml-3' : 'mr-3'}`}>
+                    {language === 'he' ? 'קהילה' : 'Community'}
+                  </span>
+                )}
+            </NavLink>
+            <NavLink to="/generate" onClick={closeSidebar} className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} `}>
+                <span className={`px-2`}>
+                  <FiImage size={20} />
+                </span>
+                {isSidebarExpanded && (
+                  <span className={`${isHebrew ? 'ml-3' : 'mr-3'}`}>
+                    {language === 'he' ? 'יצירת תמונה' : 'Generate Image'}
+                  </span>
+                )}
+            </NavLink>
+            <NavLink to="/chat" onClick={closeSidebar} className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} `}>
+              <span className={`px-2 `}>
                 <FiMessageCircle size={20} />
               </span>
               {isSidebarExpanded && <span>{language === 'he' ? 'שיחה עם AI' : 'Chat With AI'}</span>}
             </NavLink>
-
-            {/* Edit Image Link */}
-            <NavLink
-              to="/edit"
-              className={({ isActive }) =>
-                `flex items-center py-2 px-2 rounded transition ${
-                  isSidebarExpanded ? 'justify-start' : 'justify-center'
-                } ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} ${isHebrew ? 'text-right' : 'text-left'}`
-              }
-            >
-              <span className={`px-2 ${isHebrew ? 'mr-1' : 'ml-1'}`}>
+            <NavLink to="/edit" onClick={closeSidebar} className={({ isActive }) => `flex items-center py-2 px-2 rounded transition ${isSidebarExpanded ? 'justify-start' : 'justify-center'} ${isActive ? 'bg-teal-500' : 'hover:bg-gray-700'} `}>
+              <span className={`px-2 `}>
                 <FiEdit3 size={20} />
               </span>
               {isSidebarExpanded && <span>{language === 'he' ? 'עריכת תמונה' : 'Edit Image'}</span>}
@@ -115,30 +114,38 @@ const App = () => {
           </nav>
         </aside>
 
-    {/* Main Content */}
-    <div className={`flex-1 flex flex-col ${isSidebarExpanded ? (isHebrew ? 'mr-60 text-right' : 'ml-60 text-left') : (isHebrew ? 'mr-6 text-right' : 'ml-6 text-left')} overflow-hidden`}>
-      <main className="flex-1 overflow-y-auto p-6 mt-6">
-        <Routes>
-          <Route path="/" element={<Home language={language} />} />
-          <Route path="/community" element={<Community language={language} />} />
-          <Route path="/generate" element={<CreatePost language={language} />} />
-          <Route path="/chat" element={<ChatWithAI language={language} />} />
-          <Route path="/edit" element={<EditImage language={language} />} />
-        </Routes>
-      </main>
-    </div>
+{/* Main Content */}
+<div
+  className={`flex-1 mt-6 ${isSidebarExpanded && windowWidth < 768 ? 'hidden' : ''} ${
+    isHebrew
+      ? isSidebarExpanded
+        ? 'pr-60 pl-0'  // For Hebrew with sidebar expanded
+        : 'pr-10 pl-0'  // For Hebrew with sidebar collapsed
+      : isSidebarExpanded
+      ? 'pl-60 pr-0'  // For English with sidebar expanded
+      : 'pl-10 pr-0'  // For English with sidebar collapsed
+  }`}
+>
+  <main className={`flex-1 mt-8 mr-4 ml-4 `} style={{ maxHeight: windowHeight - 70 }}>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/community" element={<Community  />} />
+      <Route path="/generate" element={<CreatePost  />} />
+      <Route path="/chat" element={<ChatWithAI />} />
+      <Route path="/edit" element={<EditImage />} />
+    </Routes>
+  </main>
+</div>
 
-    {/* Language Switcher */}
-    <div className={`fixed top-4 ${isHebrew ? 'left-4' : 'right-4'} z-50`}>
-      <LanguageSwitcher language={language} setLanguage={setLanguage} />
-    </div>
-  </div>
-</BrowserRouter>
 
-
-
-
-
+        {/* Language Switcher */}
+        <div
+  className={`fixed top-4 z-50 ${isHebrew ? 'left-4' : 'right-4'}`}
+>
+  <LanguageSwitcher />
+</div>
+      </div>
+    </BrowserRouter>
   );
 };
 
