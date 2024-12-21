@@ -23,6 +23,8 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - /etc/ssl/certs:/etc/ssl/certs # SSL certifcation path - for local development remove this line
+      - /etc/ssl/private:/etc/ssl/private # SSL certifcation path - for local development remove this line
     networks:
       - app-network
     env_file:

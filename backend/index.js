@@ -40,7 +40,7 @@ const options = {
   ca: fs.readFileSync('/etc/ssl/certs/mindcraftai-ca.crt')
 };
 
-// Create HTTP server
+// Create HTTPS server
 const server = https.createServer(options, app);
 
 // Create socket.io server
