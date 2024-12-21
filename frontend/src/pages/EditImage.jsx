@@ -53,7 +53,8 @@ const EditImage = () => {
   const [isPhotoUploaded, setisPhotoUploaded] = useState(false); // Track if editing is in progress
   const [isEditing, setIsEditing] = useState(false); // New state to track editing
   const [isDownloading, setIsDownloading] = useState(false); // New state to track downloading
-  const buttonRef = useRef(null); // Create a ref for the button
+  const editButtonRef = useRef(null); // Create a ref for the button
+  const downloadButtonRef = useRef(null); // Create a ref for the button
 
 // Reset the edited image whenever a new image is uploaded or editing is stopped
   useEffect(() => {
@@ -92,18 +93,39 @@ const EditImage = () => {
       await downloadImage(editedImage, "user"); // Use 'user' or any dynamic value
 
     } catch (error) {
-      console.error("Error downloading the image:", error.message);
-    } finally {
-      setIsDownloading(false); // End downloading
+    // If prompt is empty, show an toast error message
+      if (downloadButtonRef.current) {
+        const buttonRect = downloadButtonRef.current.getBoundingClientRect();
+        const top = buttonRect.top + window.scrollY - 60;"There was an error downloading the image. Please try again.";
+        toast.error(language === 'he' ?    'הייתה בעיה בהורדה. אנא נסה שוב' : 'There was an error downloading the image. Please try again.', {
+          position: 'top-center',
+          autoClose: 3000,
+          style: { top: `${top}px` },
+        });
+      }
+      return; // Exit if input is empty    } finally {
+      
     }
-  };
+    finally{
+      if (downloadButtonRef.current) {
+              const buttonRect = downloadButtonRef.current.getBoundingClientRect();
+              const top = buttonRect.top + window.scrollY - 60;
+              toast.success(language === 'he' ? '!ההורדה הושלמה בהצלחה' : 'Download completed successfully!', {
+                position: 'top-center',
+                autoClose: 3000,
+                style: { top: `${top}px` },
+              });
+            }
+            setIsDownloading(false);
+          }
+    }
 
 
     const handleEditImage = async () => {
     if (!image || !prompt) {
       // Display a toast message if the input is empty or no image
-    if (buttonRef.current) {
-            const buttonRect = buttonRef.current.getBoundingClientRect();
+    if (editButtonRef.current) {
+            const buttonRect = editButtonRef.current.getBoundingClientRect();
             const top = buttonRect.top + window.scrollY - 60;
             toast.error(`${language === "he" ? "הזן תיאור והעלה תמונה" : "Please enter a prompt and upload an image"}`, {
               position: 'top-center',
@@ -294,11 +316,7 @@ const EditImage = () => {
 {/* ToastContainer */}
         <ToastContainer
           position="top-right"
-          containerStyle={{
-            top: `${buttonRef.current ? buttonRef.current.getBoundingClientRect().top + window.scrollY + 40 : 20}px`, 
-            right: '20px'
-          }}
-        />        <button ref={buttonRef} // Attach ref to the button
+        />        <button ref={editButtonRef} // Attach ref to the button
         onClick={handleEditImage} className="mt-2 mb-16 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 rounded-lg">
           {isEditing ? texts[language].editing : texts[language].edit}
         </button>
@@ -316,6 +334,7 @@ const EditImage = () => {
     />
     {/* Download Button */}
     <button
+    ref={downloadButtonRef}
       onClick={handleDownload} // Call the download function on button click
       className="mt-6 mb-16  bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-2 px-4 rounded-lg"
     >
