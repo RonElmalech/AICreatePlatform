@@ -55,6 +55,7 @@ const EditImage = () => {
   const [isDownloading, setIsDownloading] = useState(false); // New state to track downloading
   const editButtonRef = useRef(null); // Create a ref for the button
   const downloadButtonRef = useRef(null); // Create a ref for the button
+  const uploadButtonRef = useRef(null); // Create a ref for the button
 
 // Reset the edited image whenever a new image is uploaded or editing is stopped
   useEffect(() => {
@@ -81,14 +82,21 @@ const EditImage = () => {
       setisPhotoUploaded(true); 
     } else {
       // Display an error toast if the uploaded file is not an image
-      toast.error(language === 'he' ? 
-        "הקובץ שהועלה אינו תמונה." : 
+      if(uploadButtonRef.current){
+        const buttonRect = uploadButtonRef.current.getBoundingClientRect();
+        const top = buttonRect.top + window.scrollY - 60;
+        toast.error(language === 'he' ?
+        "הקובץ שהועלה אינו תמונה." :
         "The uploaded file is not an image.", {
         position: 'top-center',
         autoClose: 3000,
+        style: { top: `${top}px` },
       });
+      }
+      
       setisPhotoUploaded(false); // Stop editing in case of error
     }
+    
   };
   const handleDownload = async () => {
     setIsDownloading(true); // Start downloading
@@ -261,7 +269,7 @@ const EditImage = () => {
               <FiUploadCloud size={50} className="mx-auto mb-2" />
               <span>{texts[language].uploadImage}</span>
             </label>
-            <input type="file" id="upload" className="hidden" onChange={handleImageUpload} />
+            <input ref={uploadButtonRef} type="file" id="upload" className="hidden" onChange={handleImageUpload} />
           </>
         ) : (
           <img

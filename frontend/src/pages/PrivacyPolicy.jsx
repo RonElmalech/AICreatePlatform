@@ -76,15 +76,8 @@ const PrivacyPolicy = () => {
         <li>{language === 'he' ? 'לצורך מילוי חובות חוקיות.' : 'To comply with legal obligations.'}</li>
         <li>{language === 'he' ? 'להגנה על הזכויות, רכוש, ובטיחות של MindCraft, המשתמשים שלה או אחרים.' : 'To protect the rights, property, and safety of MindCraft, its users, or others.'}</li>
       </ul>
-      <h2 className="text-2xl font-semibold mb-2">
-        {language === 'he' ? '6. הזכויות שלך' : '6. Your Rights'}
-      </h2>
-      <p className="mb-6">
-        {language === 'he' 
-          ? 'יש לך את הזכות לגשת, לתקן או למחוק את המידע האישי שלך. אם ברצונך לממש את הזכויות האלה, אנא פנה אלינו בכתובת [כתובת דוא"ל].'
-          : 'You have the right to access, correct, or delete your personal information. If you wish to exercise these rights, please contact us at [email address].'
-        }
-      </p>
+      
+      
       <h2 className="text-2xl font-semibold mb-2">
         {language === 'he' ? '7. פרטיות ילדים' : '7. Children’s Privacy'}
       </h2>

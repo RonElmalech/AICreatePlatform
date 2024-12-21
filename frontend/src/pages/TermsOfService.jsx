@@ -85,7 +85,7 @@ const TermsOfService = () => {
       </h2>
       <p className="mb-6">
         {language === 'he' 
-          ? '.אנו שומרים לעצמנו את הזכות להפסיק או לסיים את הגישה שלך לשירות אם תפר את תנאי השימוש'
+          ? 'אנו שומרים לעצמנו את הזכות להפסיק או לסיים את הגישה שלך לשירות אם תפר את תנאי השימוש.'
           : 'We reserve the right to suspend or terminate your access to the Service if you violate these Terms of Service.'
         }
       </p>
@@ -94,7 +94,7 @@ const TermsOfService = () => {
       </h2>
       <p className="mb-14">
         {language === 'he' 
-          ? '.תנאי השימוש אלו כפופים לחוקי ישראל. כל סכסוך ייפתר בבתי המשפט של ישראל'
+          ? 'תנאי השימוש אלו כפופים לחוקי ישראל. כל סכסוך ייפתר בבתי המשפט של ישראל.'
           : 'These Terms of Service are governed by the laws of Israel. Any disputes will be resolved in the courts of Israel.'
         }
       </p>
