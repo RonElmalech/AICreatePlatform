@@ -1,7 +1,8 @@
 import { TranslationServiceClient } from '@google-cloud/translate';
 import { decodeBase64Credentials } from './gcloudauth.js'; 
-import { text } from 'express';
 
+
+// Ensure GCLOUD_CREDENTIALS_BASE64 environment variable is defined
 const base64Credentials = process.env.GCLOUD_CREDENTIALS_BASE64;
 
 if (!base64Credentials) {
@@ -9,13 +10,16 @@ if (!base64Credentials) {
     process.exit(1);
 }
 
+// Decode the base64 credentials using the utility function
 const credentials = decodeBase64Credentials(base64Credentials);
 
+// Initialize Google Cloud Translation client using the decoded credentials
 const translateClient = new TranslationServiceClient({
     credentials,
     projectId: process.env.GCLOUD_PROJECT_ID,
 });
 
+// Set the parent location for the translation client
 const location = 'global';
 const parent = `projects/${process.env.GCLOUD_PROJECT_ID}/locations/${location}`;
 
@@ -27,7 +31,7 @@ export async function detectAndTranslate(text) {
             throw new Error('Prompt is required');
         }
 
-        // Step 1: Detect the language of the input prompt
+        // Detect the language of the text
         const [detection] = await translateClient.detectLanguage({
             parent,
             content: text,
@@ -35,7 +39,7 @@ export async function detectAndTranslate(text) {
 
         const detectedLang = detection.languages[0].languageCode;
 
-        // Step 2: If the detected language is not English, translate it to English
+        // Translate the text to English if it is not already in English
         let translatedText = text;
         if (detectedLang !== 'en') {
             const [translation] = await translateClient.translateText({

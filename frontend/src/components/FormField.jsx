@@ -1,38 +1,54 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux'; // Import useSelector from react-redux
+import { useSelector } from 'react-redux';
 
+// Form field component
 const FormField = ({
-  labelName,
-  name,
-  value,
-  handleChange,
-  autocomplete,
-  maxRows = 5, 
+  labelName, // Label name
+  name, // Name of the input
+  value, //  Value of the input
+  handleChange, // Handle change function
+  autocomplete, // Add autocomplete attribute
+  maxRows = 5, // Set the maximum number of rows
   maxLength, // Add maxLength to restrict input
 }) => {
-  const textareaRef = useRef(null);
-  const [isFocused, setIsFocused] = useState(false); // Track focus state
-  const language = useSelector((state) => state.language.language); // Get the language from the store
+  const textareaRef = useRef(null); // Reference to the textarea element
+  const [isFocused, setIsFocused] = useState(false); // State to check if the input is focused
+  const language = useSelector((state) => state.language.language); // Get the language from Redux
+  
+  // Function to update textarea height and handle scroll
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // Reset height
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Adjust height
-      if (textareaRef.current.scrollHeight > maxRows * 24) { // Approx height per line
-        textareaRef.current.style.height = `${maxRows * 24}px`; // Max height
+      // Set the initial height (one line of text)
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  
+      // Reset height to auto to shrink back if text is deleted
+      textareaRef.current.style.height = 'auto';
+  
+      // Adjust the height based on the content
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  
+      // Apply maximum height logic
+      if (textareaRef.current.scrollHeight > maxRows * 24) {
+        textareaRef.current.style.height = `${maxRows * 24}px`;
+        textareaRef.current.style.overflowY = 'auto';
+      } else {
+        textareaRef.current.style.overflowY = 'hidden';
       }
     }
   }, [value, maxRows]);
+  // Set text alignment based on the language
+  const textAlign = language === 'he' ? 'text-right' : 'text-left';
+  const labelAlign = language === 'he' ? 'right-3' : 'left-3';
 
-  const textAlign = language === 'he' ? 'text-right' : 'text-left'; // Conditional alignment based on language
-  const labelAlign = language === 'he' ? 'right-3' : 'left-3'; // Right for Hebrew and left for English
-
-  const handleFocus = () => setIsFocused(true); // Set focus state to true
+  // Handle focus and blur events
+  const handleFocus = () => setIsFocused(true);
   const handleBlur = () => {
     if (value === '') {
-      setIsFocused(false); // Reset to false if textarea is empty
+      setIsFocused(false);
     }
   };
 
+  // Return the form field
   return (
     <div className="relative w-full">
       <textarea
@@ -41,14 +57,14 @@ const FormField = ({
         id={name}
         rows="1"
         value={value}
-        onChange={handleChange} // Use handleChange as normal
+        onChange={handleChange}
         required
         autoComplete={autocomplete}
-        maxLength={maxLength} // Add maxLength to restrict input
+        maxLength={maxLength}
         className={`bg-[#2a2a2a] border border-[#444444] text-[#f0f0f0] text-xs sm:text-sm rounded-lg focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none w-full p-2 resize-none overflow-hidden ${textAlign}`}
-        placeholder=" " // This creates the placeholder behavior
-        onFocus={handleFocus} // Trigger the label to move up on focus
-        onBlur={handleBlur} // Reset the label position when blur and empty
+        placeholder=" "
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
       <label
         htmlFor={name}

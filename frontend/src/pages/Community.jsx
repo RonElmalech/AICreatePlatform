@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Card, FormField, Loader } from '../components';
 import { useSelector } from 'react-redux';
+// Texts for different languages
 const texts = {
   en: {
     title: "Explore the Mind Craft AI Community Feed",
@@ -21,10 +22,12 @@ const texts = {
   },
 };
 
+
+// Render the cards based on the data and search results
 const RenderCards = ({ data, noResultsText, lastPostRef }) => {
   if (data?.length > 0) {
     return data.map((post, index) => {
-      // Apply the `lastPostRef` to the last element
+      // Render the last post with the ref
       return (
         <div ref={index === data.length - 1 ? lastPostRef : null} key={post._id}>
           <Card {...post} />
@@ -33,6 +36,7 @@ const RenderCards = ({ data, noResultsText, lastPostRef }) => {
     });
   }
 
+  // If no posts are available or no search results found
   return (
     <div className="flex justify-center items-center w-full col-span-full">
       <h2 className="text-xl font-bold text-cyan-500 whitespace-nowrap">
@@ -43,7 +47,11 @@ const RenderCards = ({ data, noResultsText, lastPostRef }) => {
 };
 
 const Community = () => {
+
+  // Redux state
   const language = useSelector((state) => state.language.language);
+
+  // Local state
   const [loading, setLoading] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
   const [searchText, setSearchText] = useState('');
@@ -52,6 +60,8 @@ const Community = () => {
 
   const observer = useRef();
 
+
+  // Fetch posts from the server based on the search query and page number
   const fetchPosts = async (searchQuery = '', pageNumber = 1, reset = false) => {
     setLoading(true);
     try {
@@ -61,8 +71,8 @@ const Community = () => {
 
       const { data, totalPages } = response.data;
 
-      setAllPosts((prev) => (reset ? data : [...prev, ...data]));
-      setHasMore(pageNumber < totalPages);
+      setAllPosts((prev) => (reset ? data : [...prev, ...data])); 
+      setHasMore(pageNumber < totalPages); 
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -70,36 +80,48 @@ const Community = () => {
     }
   };
 
+  // Reset the page and fetch posts when the search text changes
   useEffect(() => {
-    fetchPosts(searchText, 1, true); // Reset when search changes
+    fetchPosts(searchText, 1, true); 
   }, [searchText]);
 
+  // Load more posts when the user scrolls to the bottom
   const loadMorePosts = useCallback(() => {
     if (loading || !hasMore) return;
-    fetchPosts(searchText, page + 1);
-    setPage((prevPage) => prevPage + 1);
-  }, [loading, hasMore, searchText, page]);
+    fetchPosts(searchText, page + 1); // Fetch the next page
+    setPage((prevPage) => prevPage + 1); // Increment the page number
+  }, [loading, hasMore, searchText, page]); 
 
+  // Intersection Observer to load more posts when the user scrolls to the bottom
   const lastPostRef = useCallback((node) => {
+    // Return if loading or no more posts
     if (loading) return;
 
+    // Disconnect the previous observer
     if (observer.current) observer.current.disconnect();
+
+    // Create a new observer
     observer.current = new IntersectionObserver((entries) => {
+      // Load more posts if the last post is in view
       if (entries[0].isIntersecting && hasMore) {
         loadMorePosts();
       }
     });
+    // Observe the last post
     if (node) observer.current.observe(node);
   }, [loading, hasMore, loadMorePosts]);
 
+
+  // Handle search input change
   const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
+    setSearchText(e.target.value); // Update the search text
     setPage(1); // Reset to the first page for new searches
-    setAllPosts([]);
+    setAllPosts([]); // Reset the posts
   };
 
   return (
     <section className="max-w-screen-xl min-h-screen px-2 py-8 ">
+
     {/* Header */}
     <div className="max-w-3xl">
       <div className="w-full" >
@@ -114,6 +136,7 @@ const Community = () => {
           {texts[language].description}
         </p>
       </div>
+
       {/* Search Field */}
     <div className="px-1 mb-4">
       <FormField
@@ -131,7 +154,7 @@ const Community = () => {
     
 
     {/* Cards */}
-    <div className="card-section grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <div className="card-section grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-14">
       {searchText ? (
         <RenderCards
           data={allPosts}
@@ -146,7 +169,7 @@ const Community = () => {
             lastPostRef={lastPostRef}
           />
           {loading && (
-            <div className="flex justify-center items-center h-full col-span-full">
+            <div className="flex justify-center items-center h-full col-span-full ">
               <Loader />
             </div>
           )}

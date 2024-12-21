@@ -1,4 +1,4 @@
-# Use the official NGINX image
+# Description: This is the Dockerfile for the NGINX container. It copies the custom NGINX config and runs NGINX in the foreground.
 FROM nginx:latest
 
 # Copy the custom NGINX config

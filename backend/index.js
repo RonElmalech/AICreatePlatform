@@ -1,65 +1,66 @@
-
-import * as dotenv from 'dotenv';
-import cors from 'cors';
-import connectDB from './mongodb/connect.js';
-import postRoutes from './mongodb/routes/postRoutes.js';
-import dalleRoutes from './mongodb/routes/dalleRoutes.js';
-import path from 'path';
 import express from 'express';
+import http from 'http';
+import { Server as socketIo } from 'socket.io';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectDB from './mongodb/connect.js';
+import dalleRoutes from './mongodb/routes/dalleRoutes.js'; 
+import { initializeSocketHandlers } from './socketIo/socketHandlers.js';
+import postRoutes from './mongodb/routes/postRoutes.js'; 
 
-
-// Load environment variables
+// Load environment variables from .env file
 dotenv.config();
 
-// Create an Express application
+// Initialize express app
 const app = express();
 
-
-// Define the allowed frontend origin
-const allowedOrigins = ['http://localhost:3000',"http://localhost","https://mindcraftai.live"];
-
-// CORS options to only allow GET and POST methods from the allowed origin
+// CORS setup
+const allowedOrigins = ['http://localhost:3000', 'http://localhost', 'https://mindcraftai.live'];
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow the origin if it matches the frontend domain, or if there is no origin (e.g., for local development)
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST'],  // Allow only GET and POST methods
-  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers for the request
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
-
-// Use the CORS middleware with the defined options
+// Middleware
 app.use(cors(corsOptions));
-
-// Middleware to parse JSON
 app.use(express.json({ limit: '50mb' }));
 
-// API Routes
-app.use('/api/v1/post', postRoutes);
-app.use('/api/v1/dalle', dalleRoutes);
+// Create HTTP server
+const server = http.createServer(app);
 
-
-// Simple test route
-app.get('/', (req, res) => {
-    res.send('Hello From DALL-E');
+// Create socket.io server
+const io = new socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+  },
 });
 
-// Connect to MongoDB and start the server
-const startServer = async () => {
-    try {
-        await connectDB(process.env.MONGODB_URL);
-        console.log("Connected to MongoDB");
+// Initialize socket handlers
+initializeSocketHandlers(io);
 
-        const port = process.env.PORT || 5000;
-        app.listen(port, () => console.log(`Server running on port ${port}`));
-    } catch (error) {
-        console.log("Error starting the server:", error);
-    }
+// Routes
+app.use('/api/v1/dalle', dalleRoutes);  
+app.use('/api/v1/post', postRoutes);  
+
+
+// Start the server
+const startServer = async () => {
+  try {
+    await connectDB(process.env.MONGODB_URL);
+    console.log('Connected to MongoDB');
+    const port = process.env.PORT || 5000;
+    server.listen(port, () => console.log(`Server running on port ${port}`));
+  } catch (error) {
+    console.log('Error starting the server:', error);
+  }
 };
 
 startServer();

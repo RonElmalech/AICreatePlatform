@@ -1,16 +1,16 @@
-# Use the official Node.js image
+# Description: This file is used to build the backend image.
 FROM node:20.18.1-alpine
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the package.json file into the container
+# Copy the package.json file
 COPY package.json ./
 
-# Copy the rest of the application code into the container
+# Copy the source code
 COPY . .
 
-# Install dependencies
+# Install the dependencies
 RUN npm install
 
 # Expose the backend's port

@@ -4,7 +4,10 @@ import { FormField } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { startEditing, stopEditing } from "../store/editButtonSlice"; // Assuming the slice is in the correct path
 import { downloadImage } from "../utils/index"; // Assuming you have the downloadImage function
+import { toast, ToastContainer } from "react-toastify";
+import { useRef } from "react";
 
+// Texts for different languages
 const texts = {
   en: {
     title: "Edit Your Image",
@@ -15,7 +18,7 @@ const texts = {
     editedImageTitle: "Edited Image",
     downloadImage: "Download Image",
     strengthLabel: "Strength",
-    editing: "Editing...",
+    strengthDescription: "Adjust the intensity of the applied edit. A higher value means stronger changes.",    editing: "Editing...",
     downloading: "Downloading...",
   },
   he: {
@@ -27,18 +30,22 @@ const texts = {
     editedImageTitle: "תמונה ערוכה",
     downloadImage: "הורד תמונה",
     strengthLabel: "עוצמה",
+    strengthDescription: "כוונן את עוצמת השינויים. ערך גבוה יותר אומר שינויים חזקים יותר.",
     editing: "עורך...",
     downloading: "מוריד...",
   },
 };
 
+
 const EditImage = () => {
+  // Redux state
   const dispatch = useDispatch();
   const language = useSelector((state) => state.language.language);
   const { image: reduxImage, prompt: reduxPrompt } = useSelector(
     (state) => state.editButton
   );
 
+  // Local state
   const [image, setImage] = useState(reduxImage || null);
   const [editedImage, setEditedImage] = useState(null);
   const [prompt, setPrompt] = useState(reduxPrompt || "");
@@ -46,9 +53,16 @@ const EditImage = () => {
   const [isPhotoUploaded, setisPhotoUploaded] = useState(false); // Track if editing is in progress
   const [isEditing, setIsEditing] = useState(false); // New state to track editing
   const [isDownloading, setIsDownloading] = useState(false); // New state to track downloading
+  const buttonRef = useRef(null); // Create a ref for the button
 
+// Reset the edited image whenever a new image is uploaded or editing is stopped
   useEffect(() => {
-    // When redirected from community card, update the Redux state with initial values
+    setEditedImage(null);
+  }, [image]);
+
+  
+  // When redirected from community card, update the Redux state with initial values
+  useEffect(() => {
     if (reduxImage && reduxPrompt) {
       setImage(reduxImage);
       setPrompt(reduxPrompt);
@@ -56,12 +70,14 @@ const EditImage = () => {
     }
   }, [reduxImage, reduxPrompt]);
 
+
+  // 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]; //  Get the uploaded file
+    // Check if the uploaded file is an image
     if (file && file.type.startsWith("image/")) {
       setImage(file);  
-      setisPhotoUploaded(true); // Set editing state to true
-
+      setisPhotoUploaded(true); 
     } else {
       console.error("Uploaded file is not an image.");
       setisPhotoUploaded(false); // Stop editing in case of error]
@@ -72,7 +88,7 @@ const EditImage = () => {
     setIsDownloading(true); // Start downloading
 
     try {
-      // Use the existing downloadImage utility to download the edited image
+      // Use the downloadImage utility to download the edited image
       await downloadImage(editedImage, "user"); // Use 'user' or any dynamic value
 
     } catch (error) {
@@ -82,13 +98,26 @@ const EditImage = () => {
     }
   };
 
-  const handleEditImage = async () => {
-    if (!image) {
-      console.error("No image to process");
-      return;
-    }
+
+    const handleEditImage = async () => {
+    if (!image || !prompt) {
+      // Display a toast message if the input is empty or no image
+    if (buttonRef.current) {
+            const buttonRect = buttonRef.current.getBoundingClientRect();
+            const top = buttonRect.top + window.scrollY - 60;
+            toast.error(`${language === "he" ? "הזן תיאור והעלה תמונה" : "Please enter a prompt and upload an image"}`, {
+              position: 'top-center',
+              autoClose: 3000,
+              style: { top: `${top}px` },
+            });
+           } 
+            return; // Exit if input is empty
+          }
+      
     setIsEditing(true); // Start editing
   
+
+    // Handle the image based on its type (Blob, File, or URL)
     try {
       let imageBase64 = null;
   
@@ -186,15 +215,19 @@ const EditImage = () => {
     setImage(null); // Clear image
     setPrompt(""); // Clear prompt
     setisPhotoUploaded(false); // Stop editing
+    setEditedImage(null); // Clear edited image
   };
 
 
   return (
+
+    // Header
     <div className="max-w-4xl px-2 pt-8">
       <h2 className="text-xl font-bold mb-4">{texts[language].title}</h2>
       <p className="mb-4 text-gray-400">{texts[language].description}</p>
-
       <div className="border border-1 bg-[#1a1a1a] hover:bg-[#555555] p-4  rounded-lg text-center relative">
+
+        {/* Display the image if uploaded, else show the upload button */}
         {!image ? (
           <>
             <label htmlFor="upload" className="cursor-pointer">
@@ -211,8 +244,8 @@ const EditImage = () => {
           />
         )}
 
-        {/* Debugging: Confirm if this button is rendered */}
-        {isPhotoUploaded && (
+        {/* Display the stop editing button if an image is uploaded */}
+        {isPhotoUploaded &&  (
           <button
             onClick={handleStopEditing}
             className={`absolute top-1 ${language === "he" ? "left-1" : "right-1"} p-1 bg-[#1a1a1a] border border-1  hover:bg-[#555555] text-white rounded-full`}
@@ -225,6 +258,8 @@ const EditImage = () => {
         )}
       </div>
 
+
+      {/* Prompt FormField */}
       <div className="mt-4">
         <FormField
           labelName={texts[language].promptPlaceholder}
@@ -235,36 +270,54 @@ const EditImage = () => {
           handleChange={(e) => setPrompt(e.target.value)}
         />
 
-        <div className="mt-4">
-          <label className="block ">{texts[language].strengthLabel}</label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={strength}
-            onChange={(e) => setStrength(parseFloat(e.target.value))}
-            className="w-full bg-gray-700 accent-cyan-300"
-          />
-          <span>{strength}</span>
-        </div>
+      {/* Strength Slider */}
+<div className="mt-4">
+  <div className="flex items-center justify-between">
+    <label className="block font-bold">
+      {texts[language].strengthLabel}: <span className="text-cyan-500">{strength.toFixed(2)}</span>
+    </label>
+    <span className="text-sm text-gray-400 m-2">
+      {texts[language].strengthDescription}
+    </span>
+  </div>
+  <input
+    type="range"
+    min="0"
+    max="1"
+    step="0.01"
+    value={strength}
+    onChange={(e) => setStrength(parseFloat(e.target.value))}
+    className="w-full bg-gray-700 accent-cyan-300 mt-2 "
+  />
+</div>
 
-        <button onClick={handleEditImage} className="mt-2 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 rounded-lg">
+{/* ToastContainer */}
+        <ToastContainer
+          position="top-right"
+          containerStyle={{
+            top: `${buttonRef.current ? buttonRef.current.getBoundingClientRect().top + window.scrollY + 40 : 20}px`, 
+            right: '20px'
+          }}
+        />        <button ref={buttonRef} // Attach ref to the button
+        onClick={handleEditImage} className="mt-2 mb-16 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 rounded-lg">
           {isEditing ? texts[language].editing : texts[language].edit}
         </button>
+
       </div>
 
+      {/* Display the edited image and download button */}
       {editedImage && (
-  <div className="mt-4">
-    <h3 className="font-bold">{texts[language].editedImageTitle}</h3>
+  <div className="mt-4  ">
+    <h3 className="font-bold mb-2">{texts[language].editedImageTitle}</h3>
     <img
       src={editedImage}
       alt="Edited"
-      className="w-full max-h-96 object-contain rounded-lg"
+      className="w-full max-h-96 object-contain rounded-lg border "
     />
+    {/* Download Button */}
     <button
       onClick={handleDownload} // Call the download function on button click
-      className="mt-6 bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded-lg"
+      className="mt-6 mb-16  bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-2 px-4 rounded-lg"
     >
       {isDownloading ? texts[language].downloading : texts[language].downloadImage}
     </button>

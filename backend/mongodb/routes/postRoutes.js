@@ -4,8 +4,10 @@ import { Storage } from '@google-cloud/storage';
 import Post from '../models/post.js';
 import { decodeBase64Credentials } from '../utils/gcloudauth.js';
 
+// Load environment variables from .env file
 dotenv.config();
 
+// Initialize express app
 const router = express.Router();
 
 // Ensure GCLOUD_CREDENTIALS_BASE64 environment variable is defined
@@ -24,27 +26,34 @@ const storage = new Storage({
     projectId: process.env.GCLOUD_PROJECT_ID,
 });
 
+// Initialize the bucket using the GCLOUD_STORAGE_BUCKET environment variable
 const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
 
 router.get('/', async (req, res) => {
     try {
+        // Extract the search text, page number, and limit from the query parameters
         const { searchText = '', page = 1, limit = 10 } = req.query;
 
         const pageNumber = Math.max(Number(page), 1);
         const limitNumber = Math.max(Number(limit), 1);
 
+        // Create a regex pattern for the search text
         const searchRegex = searchText ? new RegExp(searchText, 'i') : null;
+        // Create a query object based on the search text
         const query = searchText
             ? { $or: [{ name: { $regex: searchRegex } }, { prompt: { $regex: searchRegex } }] }
             : {};
 
+        // Fetch posts based on the query, page number, and limit
         const posts = await Post.find(query)
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber)
             .sort({ createdAt: -1 });
 
+        // Count the total number of posts based on the query  
         const totalPosts = await Post.countDocuments(query);
 
+        // Return the posts, total number of posts, and pagination details
         res.status(200).json({
             success: true,
             data: posts,
