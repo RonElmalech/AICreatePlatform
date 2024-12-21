@@ -74,17 +74,22 @@ const EditImage = () => {
 
   // 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0]; //  Get the uploaded file
-    // Check if the uploaded file is an image
+    const file = e.target.files[0]; // Get the uploaded file
+    
     if (file && file.type.startsWith("image/")) {
       setImage(file);  
       setisPhotoUploaded(true); 
     } else {
-      console.error("Uploaded file is not an image.");
-      setisPhotoUploaded(false); // Stop editing in case of error]
+      // Display an error toast if the uploaded file is not an image
+      toast.error(language === 'he' ? 
+        "הקובץ שהועלה אינו תמונה." : 
+        "The uploaded file is not an image.", {
+        position: 'top-center',
+        autoClose: 3000,
+      });
+      setisPhotoUploaded(false); // Stop editing in case of error
     }
   };
-   
   const handleDownload = async () => {
     setIsDownloading(true); // Start downloading
 
