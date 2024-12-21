@@ -49,7 +49,7 @@ const ChatWithAI = () => {
   const socket = useRef(null); // Socket.io client reference for establishing a connection
   useEffect(() => {
     // Establish socket connection when the component mounts
-    socket.current = io('http://localhost:5000');
+    socket.current = io('https://mindcraftai.live/');
 
     // Capture the socket ID once connected
     socket.current.on('connect', () => {

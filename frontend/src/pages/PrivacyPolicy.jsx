@@ -79,7 +79,7 @@ const PrivacyPolicy = () => {
       
       
       <h2 className="text-2xl font-semibold mb-2">
-        {language === 'he' ? '7. פרטיות ילדים' : '7. Children’s Privacy'}
+        {language === 'he' ? '6. פרטיות ילדים' : '6. Children’s Privacy'}
       </h2>
       <p className="mb-6">
         {language === 'he' 
@@ -88,7 +88,7 @@ const PrivacyPolicy = () => {
         }
       </p>
       <h2 className="text-2xl font-semibold mb-2">
-        {language === 'he' ? '8. שינויים במדיניות פרטיות' : '8. Changes to Privacy Policy'}
+        {language === 'he' ? '7. שינויים במדיניות פרטיות' : '7. Changes to Privacy Policy'}
       </h2>
       <p className="mb-14 ">
         {language === 'he' 
