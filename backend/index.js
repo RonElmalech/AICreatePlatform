@@ -1,5 +1,5 @@
 import express from 'express';
-import http from 'http';
+import https from 'https';
 import { Server as socketIo } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -7,6 +7,7 @@ import connectDB from './mongodb/connect.js';
 import dalleRoutes from './mongodb/routes/dalleRoutes.js'; 
 import { initializeSocketHandlers } from './socketIo/socketHandlers.js';
 import postRoutes from './mongodb/routes/postRoutes.js'; 
+import fs from 'fs';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -32,8 +33,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 
+
+const options = {
+  key: fs.readFileSync('/etc/ssl/private/mindcraftai.live.key'),
+  cert: fs.readFileSync('/etc/ssl/certs/mindcraftai-ssl.crt'),
+  ca: fs.readFileSync('/etc/ssl/certs/mindcraftai-ca.crt')
+};
+
 // Create HTTP server
-const server = http.createServer(app);
+const server = https.createServer(options, app);
 
 // Create socket.io server
 const io = new socketIo(server, {
