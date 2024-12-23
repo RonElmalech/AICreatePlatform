@@ -110,3 +110,32 @@ Before running the project, ensure you have the following installed:
    ```
 
 3. The app should be live at `https://localhost` (with SSL enabled). You can also deploy the app to a cloud server and configure your domain for production.
+
+4. **Access the app**:
+   Open your browser and navigate to `https://localhost` (or the domain you configured if deploying on a server) to access the live version of the platform.
+
+5. **Stopping the Docker containers**:
+   To stop the app, you can use:
+   ```bash
+   docker-compose down
+   ```
+
+## Configuration for Cloud Deployment (Optional)
+1. **Set up a server**: Deploy your app on a cloud provider such as AWS, Google Cloud, or DigitalOcean.
+2. **Domain and SSL**: Set up a domain for your application and configure SSL/HTTPS using Nginx. You can use Let's Encrypt for free SSL certificates.
+3. **Configure environment variables**: Ensure your cloud environment has the correct environment variables set, such as the Google Cloud API credentials, Cloudflare API key, and MongoDB URI.
+
+## Troubleshooting
+
+- **Docker issues**: If you encounter issues while building or running Docker containers, ensure that Docker is running properly on your system and that you have sufficient resources allocated to Docker.
+- **Google Cloud Storage errors**: If images are not uploading to Google Cloud Storage, check your Google Cloud API credentials and ensure the correct permissions are set for your storage bucket.
+- **Socket.IO connection issues**: Ensure that your Socket.IO server is properly configured and that the backend is running before trying to connect to the frontend.
+
+## Contributing
+
+If you’d like to contribute to this project, feel free to fork the repository, make changes, and submit a pull request. Please ensure your code follows the project's style guidelines and includes appropriate tests where applicable.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
